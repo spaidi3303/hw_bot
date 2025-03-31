@@ -1,0 +1,2 @@
+secret.env filter=git-crypt diff=git-crypt
+.git-crypt/* !filter !diff
