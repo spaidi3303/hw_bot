@@ -23,13 +23,11 @@ def get_closest_lesson(lesson: str, class_name: str) -> str:
     with open('schedule.json') as file:
         array = json.loads(file.read())
     array = dict(array[class_name])
-    print(array)
     day_interval = 1
     while True:
         date = (datetime.now() + timedelta(day_interval))
         day_week = days_of_week[date.isoweekday()]
         if lesson in array[day_week]:
-            print(date.strftime('%d.%m'))
             return date.strftime('%d.%m')
         day_interval = day_interval + 1
 
