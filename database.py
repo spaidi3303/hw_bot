@@ -161,7 +161,7 @@ class Connect:
         class_name = self.get_class()
         homework = self.get_homework(class_name, lesson)
         del homework[date]
-        update_query = f"UPDATE {class_name} SET homework = $s WHERE lesson = %s"
+        update_query = f"UPDATE {class_name} SET homework = %s WHERE lesson = %s"
         with self.conn.cursor() as cursor:
             cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), lesson))
             self.conn.commit()
