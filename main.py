@@ -31,7 +31,7 @@ async def on_startup():
         send_homework_bot,
         'cron',
         hour=16,
-        minute=45,
+        minute=00,
         timezone="Europe/Moscow"
     )
     scheduler.start()
