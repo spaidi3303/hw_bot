@@ -6,6 +6,7 @@ from queue import Empty
 
 from aiogram.utils.media_group import MediaGroupBuilder
 from constants import LESSONS, SHORTCUTS
+import database
 
 days_of_week = {1: 'пн', 2: 'вт', 3: 'ср', 4: 'чт', 5: 'пт', 6: 'сб', 7: "вс"}
 
@@ -58,11 +59,12 @@ def is_lesson_in_date(lesson: str, date: str, class_name: str) -> bool:
 
 
 def is_admin(uid: int) -> bool:
+    db = database.Connect(uid)
+    class_name = db.get_class()
     with open('schedule.json') as f:
-        data = json.load(f)
-        for class_ in data.values():
-            return uid in class_['admins'] or uid in class_['own']
-        
+        data = json.load(f)[class_name]
+        return uid in data['admins'] or uid in data['own']
+    
 async def get_hw(homework, ms):
     try:
         res = []
