@@ -2,6 +2,23 @@ import datetime
 from playwright.async_api import async_playwright
 import re
 
+async def log_ps(login: str, password: str) -> bool:
+    try:
+        async with async_playwright() as p:
+            browser = await p.firefox.launch(headless=True)
+            page = await browser.new_page()
+            await page.goto('https://dnevnik.pravgym.ru/')
+            login_field = page.locator('input[name=login]')
+            password_field = page.locator('input[name=password]')
+            await login_field.fill(login)
+            await password_field.fill(password)
+            await page.click('button[type=submit]')
+            await page.locator('tr').first.wait_for()
+            return True
+    except:
+        return False
+
+
 
 async def parse(login: str, password: str) -> list[str, str, int]:
     async with async_playwright() as p:

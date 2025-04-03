@@ -19,11 +19,13 @@ class ActionListDates(CallbackData, prefix="date"):
 async def get_homework_keyboard(ms: Message):
     lesson = ms.text[3:]
     lesson = get_lesson_full_name(lesson)
-
     db = database.Connect(ms.from_user.id)
-
-    await ms.answer('Выбери дату, на которую тебе нужна домашка:',
-                    reply_markup=await dates_buttons(db.get_all_dates(lesson), db.get_class(), lesson))
+    all_dates = db.get_all_dates(lesson)
+    if all_dates.__len__() == 0:
+        await ms.answer("По этому предмету нет дз")
+        return
+    button = await dates_buttons(db.get_all_dates(lesson), db.get_class(), lesson)
+    await ms.answer('Выбери дату, на которую тебе нужна домашка:', reply_markup=button)
 
 
 @router.callback_query(ActionListDates.filter())

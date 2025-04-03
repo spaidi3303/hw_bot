@@ -105,9 +105,15 @@ async def login_input(ms: Message, state: FSMContext):
 
 @router.message(RegisterDnevnikState.password, F.text.regexp(r"\d+"))
 async def password_input(ms: Message, state: FSMContext):
-    await ms.answer("Ваши данные были сохранены. Можете просматривать оценки")
     res = await state.update_data(password=ms.text)
-    print(res)
     await state.clear()
-    db = database.Connect(ms.from_user.id)
-    db.update_login_password(res['login'], res['password'])
+    ps = await parsing.log_ps(res['login'], res['password'])
+    keep_action_alive.done = True
+    if ps:
+        await ms.answer("Ваши данные были сохранены. Можете просматривать оценки")
+        db = database.Connect(ms.from_user.id)
+        db.update_login_password(res['login'], res['password'])
+    else:
+        await ms.answer("Ваши данные не коректны! Перепроверьте логин и пароль")
+        await state.set_state(RegisterDnevnikState.login)
+        await ms.answer("Введи свой логин от дневника")
