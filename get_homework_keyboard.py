@@ -21,6 +21,7 @@ async def get_homework_keyboard(ms: Message):
     lesson = get_lesson_full_name(lesson)
     db = database.Connect(ms.from_user.id)
     all_dates = db.get_all_dates(lesson)
+    print(all_dates)
     if all_dates.__len__() == 0:
         await ms.answer("По этому предмету нет дз")
         return

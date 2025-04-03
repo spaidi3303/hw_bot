@@ -162,7 +162,7 @@ class Connect:
         except Exception as e:
                 logging.error(f'Ошибка get_all_dates: {e}')
     
-    def dell_homework(self, lesson: str, date: str):
+    def del_homework(self, lesson: str, date: str):
         class_name = self.get_class()
         homework = self.get_homework(class_name, lesson)
         del homework[date]
@@ -196,4 +196,10 @@ class Connect:
     def dell_user(self):
         with self.conn.cursor() as cursor:
             cursor.execute(f"DELETE FROM `Users` WHERE userid = %s", (self.id,))
+            self.conn.commit()
+
+    def update_all_homework(self, class_, lesson, hw):
+        update_query = f"UPDATE {class_} SET homework = %s WHERE lesson = %s"
+        with self.conn.cursor() as cursor:       
+            cursor.execute(update_query, (json.dumps(hw, ensure_ascii=False), (lesson)))
             self.conn.commit()
