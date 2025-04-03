@@ -58,7 +58,6 @@ async def marks_all_give(ms: Message):
             res = await parsing.parse_all(login, password)
             text = ""
             for grade in res:
-                print(grade)
                 text += f"\n\n{grade[0]}: {grade[1]}\n"
                 for i in grade[2]:
                     text += f"{i} "
@@ -112,6 +111,7 @@ async def password_input(ms: Message, state: FSMContext):
     if ps:
         await ms.answer("Ваши данные были сохранены. Можете просматривать оценки")
         db = database.Connect(ms.from_user.id)
+        print(res['password'])
         db.update_login_password(res['login'], res['password'])
     else:
         await ms.answer("Ваши данные не коректны! Перепроверьте логин и пароль")
