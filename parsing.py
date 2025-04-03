@@ -48,6 +48,7 @@ async def parse(login: str, password: str) -> list[str, str, int]:
 
 async def parse_all(login: str, password: str) -> list[str, str, int]:
     async with async_playwright() as p:
+        print(login, password)
         date = get_trimestr()
         browser = await p.firefox.launch(headless=True)
         page = await browser.new_page()

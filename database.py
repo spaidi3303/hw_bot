@@ -30,8 +30,13 @@ class Connect:
         self.id = id
         with self.conn.cursor() as cursor:
             cursor.execute(
-                f"CREATE TABLE IF NOT EXISTS `Users` (userid VARCHAR(15) PRIMARY KEY, class TEXT, login INT DEFAULT 0, password INT DEFAULT 0)"
-                )
+                "CREATE TABLE IF NOT EXISTS `Users` ("
+                "userid VARCHAR(15) PRIMARY KEY, "
+                "class TEXT, "
+                "login VARCHAR(255) DEFAULT '0', "  # Указана максимальная длина
+                "password VARCHAR(255) DEFAULT '0'"  # Указана максимальная длина
+                ")"
+            )
             self.conn.commit()
     
     def __del__(self):
@@ -51,7 +56,7 @@ class Connect:
                     self.conn.commit()
 
         except Exception as e:
-            logging.error(f"Ошибка check_table: {e}")
+            ...
 
 
     def user_exists(self) -> bool:
