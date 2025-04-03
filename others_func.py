@@ -4,6 +4,8 @@ import json
 import logging
 from queue import Empty
 
+from aiogram import Bot
+from aiogram.types import Message
 from aiogram.utils.media_group import MediaGroupBuilder
 from constants import LESSONS, SHORTCUTS
 import database
@@ -64,8 +66,13 @@ def is_admin(uid: int) -> bool:
     with open('schedule.json') as f:
         data = json.load(f)[class_name]
         return uid in data['admins'] or uid in data['own']
-    
-async def get_hw(homework, ms):
+
+
+async def get_hw(homework, ms: Message | None = None, bot: Bot | None = None, uid: int | None = None):
+    """
+    Если задан ms - сообщения будут отсылаться командой await ms.answer(...)
+    Если bot и uid - await bot.send_message(uid, ...)
+    """
     try:
         res = []
         for lesson, hw in homework.items():
@@ -91,16 +98,28 @@ async def get_hw(homework, ms):
                             album_builder.add_photo(
                                 media=fi_id
                             )
-                        await ms.answer_media_group(
-                            media=album_builder.build()
-                        )
+                        if ms is not None:
+                            await ms.answer_media_group(
+                                media=album_builder.build()
+                            )
+                        else:
+                            await bot.send_media_group(
+                                chat_id=uid,
+                                media=album_builder.build()
+                            )
 
                 else:
                     for j in array_hw:
                         text += f"\n- {j}"
                     else:
-                        await ms.answer(text)
+                        if ms is not None:
+                            await ms.answer(text)
+                        else:
+                            await bot.send_message(uid, text)
         else:
-            await ms.answer('Нет дз')
+            if ms is not None:
+                await ms.answer('Нет дз')
+            else:
+                await bot.send_message(uid, 'Нет дз')
     except Exception as e:
-                logging.error(f'Ошибка get_hw_other: {e}')
+        logging.error(f'Ошибка get_hw_other: {e}')

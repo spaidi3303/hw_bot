@@ -1,11 +1,8 @@
 from datetime import datetime, timedelta
-import json
-from queue import Empty
 import re
 
 from aiogram import Router, F
 from aiogram.types import Message
-from aiogram.utils.media_group import MediaGroupBuilder
 from constants import WEEKDAYS
 import database
 from others_func import get_hw, get_prope_date
@@ -33,5 +30,4 @@ async def get_homework(ms: Message):
         date = get_prope_date(weekday)
         homeworks = db.get_all_homework(class_name, date)
 
-    await get_hw(homeworks, ms)
-    
+    await get_hw(homeworks, ms=ms)

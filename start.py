@@ -25,9 +25,9 @@ async def start(message: Message):
     db = database.Connect(message.from_user.id)
     if db.user_exists():
         if is_admin(message.from_user.id):
-            await message.answer(FULL_HELP, parse_mode=ParseMode.MARKDOWN_V2)
+            await message.answer(ADMIN_HELP, parse_mode=ParseMode.MARKDOWN_V2)
         else:
-            await message.answer(HELP, parse_mode=ParseMode.MARKDOWN_V2)
+            await message.answer(USER_HELP, parse_mode=ParseMode.MARKDOWN_V2)
     else:
         
         await message.answer('Привет! Выбери свой класс:',

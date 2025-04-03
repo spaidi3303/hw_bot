@@ -1,9 +1,5 @@
-import json
-from queue import Empty
-
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram.utils.keyboard import CallbackData, InlineKeyboardBuilder, InlineKeyboardButton
 
 from constants import LESSONS, SHORTCUTS
@@ -23,11 +19,13 @@ class ActionListDates(CallbackData, prefix="date"):
 async def get_homework_keyboard(ms: Message):
     lesson = ms.text[3:]
     lesson = get_lesson_full_name(lesson)
-
     db = database.Connect(ms.from_user.id)
-
-    await ms.answer('Выбери дату, на которую тебе нужна домашка:',
-                    reply_markup=await dates_buttons(db.get_all_dates(lesson), db.get_class(), lesson))
+    all_dates = db.get_all_dates(lesson)
+    if all_dates.__len__() == 0:
+        await ms.answer("По этому предмету нет дз")
+        return
+    button = await dates_buttons(db.get_all_dates(lesson), db.get_class(), lesson)
+    await ms.answer('Выбери дату, на которую тебе нужна домашка:', reply_markup=button)
 
 
 @router.callback_query(ActionListDates.filter())
@@ -38,7 +36,7 @@ async def on_date_choice(query: CallbackQuery, callback_data: ActionListDates):
     for lesson, hw in homework.items():
         res.append(f'{lesson} - {hw}')
         
-    await get_hw(homework, query.message)
+    await get_hw(homework, ms=query.message)
 
 
 async def dates_buttons(dates: list[str], class_name: str, lesson: str):

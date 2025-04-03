@@ -1,7 +1,24 @@
 import datetime
-from tarfile import data_filter
 from playwright.async_api import async_playwright
 import re
+
+async def log_ps(login: str, password: str) -> bool:
+    try:
+        async with async_playwright() as p:
+            browser = await p.firefox.launch(headless=True)
+            page = await browser.new_page()
+            await page.goto('https://dnevnik.pravgym.ru/')
+            login_field = page.locator('input[name=login]')
+            password_field = page.locator('input[name=password]')
+            await login_field.fill(login)
+            await password_field.fill(password)
+            await page.click('button[type=submit]')
+            await page.locator('tr').first.wait_for()
+            return True
+    except:
+        return False
+
+
 
 async def parse(login: str, password: str) -> list[str, str, int]:
     async with async_playwright() as p:
@@ -22,11 +39,12 @@ async def parse(login: str, password: str) -> list[str, str, int]:
         for row in table_rows:
             try:
                 date, subject, grade = (await row.all_inner_texts())[0].split('\t')
-            except ValueError:  # table ended
+            except ValueError:  # таблица закончилась
                 continue
             grades.append((date, subject, int(grade)))
         await browser.close()
         return grades
+
 
 async def parse_all(login: str, password: str) -> list[str, str, int]:
     async with async_playwright() as p:
@@ -60,17 +78,17 @@ async def parse_all(login: str, password: str) -> list[str, str, int]:
             res_array.append((lesson, bal, marks))
         await browser.close()
         return res_array
-    
 
-def get_trimestr():
-    today = datetime.datetime.now()
+
+def get_trimestr() -> datetime:
+    today = datetime.now()
     current_year = today.year
-    first_tr_date = datetime.datetime.strptime(f"{current_year}-09-01", "%Y-%m-%d")
-    second_tr_date = datetime.datetime.strptime(f"{current_year}-11-18", "%Y-%m-%d")
-    third_tr_date = datetime.datetime.strptime(f"{current_year}-02-23", "%Y-%m-%d")
-    if today >= first_tr_date and today < second_tr_date:
-        return first_tr_date.strftime("%Y-%m-%d")
-    elif today >= second_tr_date and today < third_tr_date:
-        return second_tr_date.strftime("%Y-%m-%d")
-    elif today >= third_tr_date or today < first_tr_date:
+    first_tr_date = datetime.strptime(f"{current_year}-09-01", "%Y-%m-%d")
+    second_tr_date = datetime.strptime(f"{current_year}-11-18", "%Y-%m-%d")
+    third_tr_date = datetime.strptime(f"{current_year}-02-23", "%Y-%m-%d")
+    if today >= third_tr_date:
         return third_tr_date.strftime("%Y-%m-%d")
+    elif today >= second_tr_date:
+        return second_tr_date.strftime("%Y-%m-%d")
+    elif today >= first_tr_date:
+        return first_tr_date.strftime("%Y-%m-%d")
