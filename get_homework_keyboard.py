@@ -1,9 +1,5 @@
-import json
-from queue import Empty
-
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram.utils.keyboard import CallbackData, InlineKeyboardBuilder, InlineKeyboardButton
 
 from constants import LESSONS, SHORTCUTS
@@ -38,7 +34,7 @@ async def on_date_choice(query: CallbackQuery, callback_data: ActionListDates):
     for lesson, hw in homework.items():
         res.append(f'{lesson} - {hw}')
         
-    await get_hw(homework, query.message)
+    await get_hw(homework, ms=query.message)
 
 
 async def dates_buttons(dates: list[str], class_name: str, lesson: str):
