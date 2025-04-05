@@ -4,9 +4,9 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from constants import LESSONS, SHORTCUTS, WEEKDAYS
+from others.constants import LESSONS, SHORTCUTS, WEEKDAYS
 import database
-from others_func import get_closest_lesson, get_lesson_full_name, get_prope_date, is_admin, is_lesson_in_date
+from others.others_func import get_closest_lesson, get_lesson_full_name, get_prope_date, is_admin, is_lesson_in_date
 
 router = Router()
 

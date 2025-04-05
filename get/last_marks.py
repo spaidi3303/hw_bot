@@ -6,7 +6,7 @@ from aiogram.utils.keyboard import CallbackData, InlineKeyboardBuilder, InlineKe
 import re
 from aiogram.fsm.context import FSMContext
 import database
-import parsing
+import others.parsing as parsing
 from aiogram.enums import ChatAction
 from aiogram.fsm.state import StatesGroup, State
 

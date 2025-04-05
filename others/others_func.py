@@ -7,7 +7,7 @@ from queue import Empty
 from aiogram import Bot
 from aiogram.types import Message
 from aiogram.utils.media_group import MediaGroupBuilder
-from constants import LESSONS, SHORTCUTS
+from others.constants import LESSONS, SHORTCUTS
 import database
 
 days_of_week = {1: 'пн', 2: 'вт', 3: 'ср', 4: 'чт', 5: 'пт', 6: 'сб', 7: "вс"}

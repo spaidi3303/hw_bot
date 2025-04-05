@@ -3,7 +3,7 @@ from aiogram.types import Message
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.utils import markdown as md
 
-from others_func import is_admin
+from others.others_func import is_admin
 
 router = Router()
 

@@ -4,8 +4,8 @@ from aiogram.utils.keyboard import CallbackData, InlineKeyboardBuilder, InlineKe
 
 from aiogram.enums.parse_mode import ParseMode
 import database
-from help import ADMIN_HELP, USER_HELP
-from others_func import is_admin
+from others.help import ADMIN_HELP, USER_HELP
+from others.others_func import is_admin
 
 router = Router()
 block_user = [6068641104, 7778655804]
