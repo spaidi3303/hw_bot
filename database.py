@@ -4,8 +4,8 @@ import pymysql
 import json
 from dotenv import load_dotenv
 import os
-from constants import LESSONS
-from others_func import get_lesson_full_name
+from others.constants import LESSONS
+from others.others_func import get_lesson_full_name
 
 days_of_week = {1: 'пн', 2: 'вт', 3: 'ср', 4: 'чт', 5: 'пт', 6: 'сб', 7: "вс"}
 

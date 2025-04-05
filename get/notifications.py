@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from aiogram import Bot
 
 from database import Connect
-from others_func import get_hw
+from others.others_func import get_hw
 
 
 async def send_homework(bot: Bot):

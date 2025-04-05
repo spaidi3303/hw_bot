@@ -8,8 +8,8 @@ from aiogram.enums.parse_mode import ParseMode
 from aiogram.methods import DeleteWebhook
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from dotenv import load_dotenv
-from notifications import send_homework
-import routers
+from get.notifications import send_homework
+import others.routers as routers
 
 load_dotenv("secret.env") 
 TOKEN = os.getenv("token")

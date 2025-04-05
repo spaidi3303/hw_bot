@@ -3,8 +3,8 @@ import re
 from aiogram import Router, F
 from aiogram.types import Message
 
-from constants import LESSONS, SHORTCUTS, WEEKDAYS
-from others_func import get_closest_lesson, get_lesson_full_name, get_prope_date, is_admin, is_lesson_in_date
+from others.constants import LESSONS, SHORTCUTS, WEEKDAYS
+from others.others_func import get_closest_lesson, get_lesson_full_name, get_prope_date, is_admin, is_lesson_in_date
 import database
 
 router = Router()
