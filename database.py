@@ -56,7 +56,7 @@ class Connect:
                     self.conn.commit()
 
         except Exception as e:
-            logging.error(f'Ошибка create_table: {e}')
+            logging.error(f'Ошибка check_table: {e}')
 
     def user_exists(self) -> bool:
         query = "SELECT userid FROM `Users` WHERE userid = %s"
