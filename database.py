@@ -9,13 +9,13 @@ from others_func import get_lesson_full_name
 
 days_of_week = {1: 'пн', 2: 'вт', 3: 'ср', 4: 'чт', 5: 'пт', 6: 'сб', 7: "вс"}
 
-
 load_dotenv("secret.env")  # Загружает переменные из файла
 # token = os.getenv("token")
 database = os.getenv("database")
 host = os.getenv("host")
 password = os.getenv("password")
 user = os.getenv("user")
+
 
 class Connect:
     def __init__(self, id):
@@ -38,7 +38,7 @@ class Connect:
                 ")"
             )
             self.conn.commit()
-    
+
     def __del__(self):
         self.conn.close()
 
@@ -56,23 +56,22 @@ class Connect:
                     self.conn.commit()
 
         except Exception as e:
-            ...
-
+            logging.error(f'Ошибка create_table: {e}')
 
     def user_exists(self) -> bool:
-        query = f"SELECT userid FROM `Users` WHERE userid = %s"
+        query = "SELECT userid FROM `Users` WHERE userid = %s"
         with self.conn.cursor() as cursor:
             cursor.execute(query, (self.id, ))
             result = cursor.fetchone()
             return result is not None
-        
+
     def create_user(self, class_name):
         self.check_table(class_name)
-        query = f"INSERT INTO `Users` (userid, class) VALUES (%s, %s)"
+        query = "INSERT INTO `Users` (userid, class) VALUES (%s, %s)"
         with self.conn.cursor() as cursor:
             cursor.execute(query, (self.id, class_name))
             self.conn.commit()
-    
+
     def get_homework(self, class_name: str, lesson: str) -> dict:
         try:
             query = f"SELECT homework FROM {class_name} WHERE lesson = %s"
@@ -81,7 +80,7 @@ class Connect:
                 result = cursor.fetchone()
             try:
                 return json.loads(result['homework'])
-            except:
+            except Exception:
                 return {}
         except Exception as e:
                 logging.error(f'Ошибка get_hw: {e}')
@@ -103,7 +102,7 @@ class Connect:
                 self.conn.commit()
         except Exception as e:
                 logging.error(f'Ошибка update_homework: {e}')
-        
+
     def del_table(self, table_name):
         with self.conn.cursor() as cursor:
             cursor.execute(f"DROP TABLE {table_name}")
@@ -111,16 +110,16 @@ class Connect:
 
     def get_class(self):
         with self.conn.cursor() as cursor:
-            cursor.execute(f"SELECT class FROM Users WHERE userid = %s", (self.id, ))
+            cursor.execute("SELECT class FROM Users WHERE userid = %s", (self.id, ))
             result = cursor.fetchone()
             return result['class']
-    
+
     def get_class_id(self, uid):
         with self.conn.cursor() as cursor:
-            cursor.execute(f"SELECT class FROM Users WHERE userid = %s", (uid,))
+            cursor.execute("SELECT class FROM Users WHERE userid = %s", (uid,))
             result = cursor.fetchone()
             return result['class']
-        
+
     def get_all_homework(self, class_name, date: str) -> dict:
         try:
             array = {}
@@ -161,7 +160,7 @@ class Connect:
             return sorted_dates
         except Exception as e:
                 logging.error(f'Ошибка get_all_dates: {e}')
-    
+
     def del_homework(self, lesson: str, date: str):
         class_name = self.get_class()
         homework = self.get_homework(class_name, lesson)
@@ -172,18 +171,18 @@ class Connect:
             self.conn.commit()
 
     def get_login_password(self):
-        query = F"SELECT login, password FROM Users WHERE userid = %s"
+        query = "SELECT login, password FROM Users WHERE userid = %s"
         with self.conn.cursor() as cursor:
             cursor.execute(query, (self.id,))
             result = cursor.fetchone()
         return str(result['login']), str(result['password'])
 
     def update_login_password(self, login: str, password: str):
-        query = f"UPDATE Users SET login = %s, password = %s WHERE userid = %s"
+        query = "UPDATE Users SET login = %s, password = %s WHERE userid = %s"
         with self.conn.cursor() as cursor:
             cursor.execute(query, (login, password, self.id))
             self.conn.commit()
-    
+
     def get_all_id(self):
         with self.conn.cursor() as cursor:
             cursor.execute("SELECT userid FROM Users")
@@ -192,10 +191,10 @@ class Connect:
         for i in result:
             array.append(i['userid'])
         return array
-    
+
     def dell_user(self):
         with self.conn.cursor() as cursor:
-            cursor.execute(f"DELETE FROM `Users` WHERE userid = %s", (self.id,))
+            cursor.execute("DELETE FROM `Users` WHERE userid = %s", (self.id,))
             self.conn.commit()
 
     def update_all_homework(self, class_, lesson, hw):
