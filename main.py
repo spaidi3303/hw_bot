@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
@@ -41,7 +40,6 @@ async def main():
     await bot(DeleteWebhook(drop_pending_updates=True))
     logging.basicConfig(level=logging.INFO)
     await dp.start_polling(bot)
-
 
 if __name__ == "__main__":
     dp.startup.register(on_startup)

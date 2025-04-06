@@ -15,7 +15,10 @@ class PhotoAlbumState(StatesGroup):
     waiting_for_album = State()  # Состояние для сбора альбома
 
 
-@router.message(F.photo)
+@router.message(F.photo.caption.lower().regexp(f"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())})$")|
+                F.photo.caption.lower().regexp(fr"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) \d\d\.\d\d$")|
+                F.photo.caption.lower().regexp(fr"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) ({'|'.join(WEEKDAYS)})$")
+)
 async def handle_photo_album(message: Message, state: FSMContext):
     current_data = await state.get_data()
     if "photos" not in current_data:
