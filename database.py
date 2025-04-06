@@ -123,7 +123,7 @@ class Connect:
     def get_all_homework(self, class_name, date: str) -> dict:
         try:
             array = {}
-            with open('others/schedule.json') as file:
+            with open('schedule.json') as file:
                 array = json.loads(file.read())
             dates = list(map(int, date.split('.')))
             try:

@@ -15,8 +15,14 @@ class PhotoAlbumState(StatesGroup):
     waiting_for_album = State()  # Состояние для сбора альбома
 
 
-@router.message(F.message.caption)
+@router.message(F.caption.lower().regexp(f"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())})$")|
+                F.caption.lower().regexp(fr"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) \d\d\.\d\d$")|
+                F.caption.lower().regexp(fr"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) ({'|'.join(WEEKDAYS)})$")
+)
 async def handle_photo_album(message: Message, state: FSMContext):
+    if not is_admin(message.from_user.id):
+        await message.answer("Ты не админ!")
+        return
     current_data = await state.get_data()
     if "photos" not in current_data:
         await state.update_data(photos=[], caption=None)
@@ -38,52 +44,26 @@ async def handle_photo_album(message: Message, state: FSMContext):
 
 
 async def add_homework_photos(caption: str, photos: list, message: Message):
-    # русский 31.03
+    db = database.Connect(message.from_user.id)
+    lesson = ""
+    date = ""
+    class_name = db.get_class()
+
     if re.fullmatch(f"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())})$", caption.lower()):
         lesson = get_lesson_full_name(caption)
-        db = database.Connect(message.from_user.id)
-        if not is_admin(message.from_user.id):
-            await message.answer("Ты не админ!")
-            return
-        class_name = db.get_class()
         date = get_closest_lesson(lesson, class_name)
-        
-        db.update_homework(class_name, lesson, date, photos)
-        await message.answer(f"Домашнее задание было добавлено в {lesson} на {date}")
-
     elif re.fullmatch(fr"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) \d\d\.\d\d$", caption.lower()):
         date = re.findall(r"\d\d\.\d\d", caption)[0]
         index = (caption.index(re.findall(r"\d", caption)[0]))
         lesson = get_lesson_full_name(str(caption[:index]))
-
-        db = database.Connect(message.from_user.id)
-        if not is_admin(message.from_user.id):
-            await message.answer("Ты не админ!")
-            return
-        class_name = db.get_class()
-        if not is_lesson_in_date(lesson, date, class_name):
-            await message.answer(f"Урок {lesson} в указанную дату не найден.")
-            return
-
-        db.update_homework(class_name, lesson, date, photos)
-        await message.answer(f"Домашнее задание было добавлено в {lesson} на {date}")
-
     elif re.fullmatch(fr"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) ({'|'.join(WEEKDAYS)})$", caption.lower()):
         weekday = re.findall(f"{'|'.join(WEEKDAYS)}", caption)[0]
         date = get_prope_date(weekday)
         lesson = caption[:caption.find(weekday)]
         lesson = get_lesson_full_name(lesson)
-
-        db = database.Connect(message.from_user.id)
-        if not is_admin(message.from_user.id):
-            await message.answer("Ты не админ!")
-            return
-        class_name = db.get_class()
-        if not is_lesson_in_date(lesson, date, class_name):
-            await message.answer(f"Урок {lesson} в указанный день не найден.")
-            return
         
-        db.update_homework(class_name, lesson, date, photos)
-        await message.answer(f"Домашнее задание было добавлено в {lesson} на {date}")
-    else:
-        ...
+    if not is_lesson_in_date(lesson, date, class_name):
+            await message.answer(f"Урок {lesson} в указанный день не найден.")
+            return   
+    db.update_homework(class_name, lesson, date, photos)
+    await message.answer(f"Домашнее задание было добавлено в {lesson} на {date}")

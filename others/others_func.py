@@ -23,7 +23,7 @@ WEEKDAYS_DICT = {
 
 
 def get_closest_lesson(lesson: str, class_name: str) -> str:
-    with open('/others/schedule.json') as file:
+    with open('schedule.json') as file:
         array = json.loads(file.read())
     array = dict(array[class_name])
     day_interval = 1
@@ -55,7 +55,7 @@ def get_lesson_full_name(lesson: str) -> str | None:
 def is_lesson_in_date(lesson: str, date: str, class_name: str) -> bool:
     dates = list(map(int, date.split('.')))
     weekday = days_of_week[datetime(year=datetime.now().year, month=dates[1], day=dates[0]).isoweekday()]
-    with open('others/schedule.json') as file:
+    with open('schedule.json') as file:
         lessons = json.loads(file.read())[class_name][weekday]
     return lesson in lessons
 
@@ -63,7 +63,7 @@ def is_lesson_in_date(lesson: str, date: str, class_name: str) -> bool:
 def is_admin(uid: int) -> bool:
     db = database.Connect(uid)
     class_name = db.get_class()
-    with open('others/schedule.json') as f:
+    with open('schedule.json') as f:
         data = json.load(f)[class_name]
         return uid in data['admins'] or uid in data['own']
 
