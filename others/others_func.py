@@ -83,6 +83,7 @@ async def get_hw(homework, ms: Message | None = None, bot: Bot | None = None, ui
                 hw = i[i.index("-")+2:]
                 array_hw = json.loads(hw.replace("'", '"'))
                 if any(isinstance(item, list) for item in array_hw):
+                    print(i)
                     photo_ids = []
                     for j in array_hw:
                         if isinstance(j, str):

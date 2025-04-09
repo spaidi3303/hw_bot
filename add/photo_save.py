@@ -15,10 +15,7 @@ class PhotoAlbumState(StatesGroup):
     waiting_for_album = State()  # Состояние для сбора альбома
 
 
-@router.message(F.caption.lower().regexp(f"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())})$")|
-                F.caption.lower().regexp(fr"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) \d\d\.\d\d$")|
-                F.caption.lower().regexp(fr"^({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) ({'|'.join(WEEKDAYS)})$")
-)
+@router.message(F.photo)
 async def handle_photo_album(message: Message, state: FSMContext):
     if not is_admin(message.from_user.id):
         await message.answer("Ты не админ!")
@@ -44,6 +41,7 @@ async def handle_photo_album(message: Message, state: FSMContext):
 
 
 async def add_homework_photos(caption: str, photos: list, message: Message):
+    print(photos)
     db = database.Connect(message.from_user.id)
     lesson = ""
     date = ""
@@ -61,7 +59,8 @@ async def add_homework_photos(caption: str, photos: list, message: Message):
         date = get_prope_date(weekday)
         lesson = caption[:caption.find(weekday)]
         lesson = get_lesson_full_name(lesson)
-        
+    else:
+        return
     if not is_lesson_in_date(lesson, date, class_name):
             await message.answer(f"Урок {lesson} в указанный день не найден.")
             return   
