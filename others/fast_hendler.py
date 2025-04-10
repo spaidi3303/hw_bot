@@ -6,7 +6,7 @@ from others.constants import OWN_ID
 router = Router()
 
 
-@router.message(F.from_user.id.in_([6068641104, 7901309523]))
+@router.message(F.from_user.id.in_([]))
 async def ban_user(ms: types.Message):
     ...
 
