@@ -5,8 +5,11 @@ from others.constants import OWN_ID
 
 router = Router()
 
+db = database.Connect(1)
+all_id = db.get_all_id()
+del db
 
-@router.message(F.from_user.id.in_([]))
+@router.message(~F.from_user.id.in_(all_id))
 async def ban_user(ms: types.Message):
     ...
 
