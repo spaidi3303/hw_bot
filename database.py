@@ -33,8 +33,8 @@ class Connect:
                 "CREATE TABLE IF NOT EXISTS `Users` ("
                 "userid VARCHAR(15) PRIMARY KEY, "
                 "class TEXT, "
-                "login VARCHAR(255) DEFAULT '0', "  # Указана максимальная длина
-                "password VARCHAR(255) DEFAULT '0'"  # Указана максимальная длина
+                "login VARCHAR(255) DEFAULT '0', "
+                "password VARCHAR(255) DEFAULT '0'"
                 ")"
             )
             self.conn.commit()
