@@ -78,7 +78,7 @@ def is_admin(uid: int) -> bool:
     class_name = db.get_class()
     res = db.get_admins()
     if (uid == res['own']) or (uid in res['admins']):
-        data = json.load(f)[class_name]
+        data = json.load()[class_name]
         return uid in data['admins'] or uid in data['own']
 
 
