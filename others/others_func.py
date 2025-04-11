@@ -23,9 +23,15 @@ WEEKDAYS_DICT = {
 
 
 def get_closest_lesson(lesson: str, class_name: str) -> str:
-    with open('schedule.json') as file:
-        array = json.loads(file.read())
-    array = dict(array[class_name])
+    db = database.Connect(1)
+    all_id = db.get_all_id()
+    del db
+    uid = ""
+    for i in all_id:
+        if db.get_class_id(i) == class_name:
+            uid = i
+    db = database.Connect(uid)
+    array = db.get_lessons()
     day_interval = 1
     while True:
         date = (datetime.now() + timedelta(day_interval))
@@ -55,15 +61,23 @@ def get_lesson_full_name(lesson: str) -> str | None:
 def is_lesson_in_date(lesson: str, date: str, class_name: str) -> bool:
     dates = list(map(int, date.split('.')))
     weekday = days_of_week[datetime(year=datetime.now().year, month=dates[1], day=dates[0]).isoweekday()]
-    with open('schedule.json') as file:
-        lessons = json.loads(file.read())[class_name][weekday]
+    db = database.Connect(1)
+    all_id = db.get_all_id()
+    del db
+    uid = ""
+    for i in all_id:
+        if db.get_class_id(i) == class_name:
+            uid = i
+    db = database.Connect(uid)
+    lessons = db.get_lessons()[weekday]
     return lesson in lessons
 
 
 def is_admin(uid: int) -> bool:
     db = database.Connect(uid)
     class_name = db.get_class()
-    with open('schedule.json') as f:
+    res = db.get_admins()
+    if (uid == res['own']) or (uid in res['admins']):
         data = json.load(f)[class_name]
         return uid in data['admins'] or uid in data['own']
 

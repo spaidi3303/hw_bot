@@ -7,7 +7,6 @@ router = Router()
 
 db = database.Connect(1)
 all_id = db.get_all_id()
-print(all_id)
 del db
 
 @router.message(lambda message: str(message.from_user.id) not in all_id)

@@ -63,3 +63,11 @@ WEEKDAYS = [
 ]
 
 OWN_ID = [2098644058, 7205739089]
+WEEKDAYS_DB = {
+    "monday": "пн",
+    "tuesday": "вт",
+    "wednesday": "ср",
+    "thursday": "чт",
+    "friday": "пт",
+    "saturday": "сб"
+}

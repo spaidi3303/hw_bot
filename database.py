@@ -1,13 +1,14 @@
 import datetime
 import logging
+import re
 import pymysql
 import json
 from dotenv import load_dotenv
 import os
-from others.constants import LESSONS
+from others.constants import LESSONS, WEEKDAYS_DB
 from others.others_func import get_lesson_full_name
 
-days_of_week = {1: 'пн', 2: 'вт', 3: 'ср', 4: 'чт', 5: 'пт', 6: 'сб', 7: "вс"}
+days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday'}
 
 load_dotenv("secret.env")  # Загружает переменные из файла
 # token = os.getenv("token")
@@ -41,18 +42,44 @@ class Connect:
 
     def __del__(self):
         self.conn.close()
-
-    def check_table(self, class_name):
+    def check_table(self, db_name):
         try:
-            command = "(id INT AUTO_INCREMENT PRIMARY KEY, lesson VARCHAR(255) UNIQUE, homework JSON)"
-            with self.conn.cursor() as cursor:
-                cursor.execute(f"CREATE TABLE IF NOT EXISTS {class_name} {command}")
-            self.conn.commit()
-            array = list(LESSONS.values())
-            for lesson in array:
-                insert_query = f"INSERT INTO {class_name} (lesson, homework) VALUES (%s, %s)"
+            if re.fullmatch(r"\d\d_[a-z]", db_name):
+                command = "(id INT AUTO_INCREMENT PRIMARY KEY, lesson VARCHAR(255) UNIQUE, homework JSON)"
                 with self.conn.cursor() as cursor:
-                    cursor.execute(insert_query, (lesson, json.dumps({})))
+                    cursor.execute(f"CREATE TABLE IF NOT EXISTS {db_name} {command}")
+                self.conn.commit()
+                array = list(LESSONS.values())
+                for lesson in array:
+                    insert_query = f"INSERT INTO {db_name} (lesson, homework) VALUES (%s, %s)"
+                    with self.conn.cursor() as cursor:
+                        cursor.execute(insert_query, (lesson, json.dumps({})))
+                        self.conn.commit()
+            elif re.fullmatch(r"\d\d_[a-z]_.*", db_name):
+                command = "(id INT AUTO_INCREMENT PRIMARY KEY, `key` VARCHAR(255) UNIQUE, `value` JSON)"
+                with self.conn.cursor() as cursor:
+                    cursor.execute(f"CREATE TABLE IF NOT EXISTS {db_name} {command}")
+                    self.conn.commit()
+
+                class_ = re.findall(r"\d\d_[a-z]", db_name)[0]
+                js = {}
+                for weekday in WEEKDAYS_DB.keys():
+                    with open('schedule.json') as file:
+                        array = json.loads(file.read())
+                    array = (array[class_][WEEKDAYS_DB[weekday]])
+                    js[weekday] = array
+                insert_query = f"INSERT INTO `{db_name}` (`key`, `value`) VALUES (%s, %s)"
+                with self.conn.cursor() as cursor:
+                    cursor.execute(insert_query, ("schedule", json.dumps(js, ensure_ascii=False)))
+                    self.conn.commit()
+                        
+                with open('schedule.json') as file:
+                    array = json.loads(file.read())                  
+                own = array[class_]["own"][0]
+                insert_query = f"INSERT INTO `{db_name}` (`key`, `value`) VALUES (%s, %s)"
+                js_admins = {"own": own, "admins": []}
+                with self.conn.cursor() as cursor:
+                    cursor.execute(insert_query, ("admins", json.dumps(js_admins, ensure_ascii=False)))
                     self.conn.commit()
 
         except Exception as e:
@@ -120,17 +147,39 @@ class Connect:
             result = cursor.fetchone()
             return result['class']
 
+    def get_lessons(self):
+        try:
+            tb_name = f"{self.get_class()}_class"
+            with self.conn.cursor() as cursor:
+                cursor.execute(f"SELECT `value` FROM `{tb_name}` WHERE `key` = %s", ("schedule", ))
+                result = cursor.fetchone()
+            result = json.loads(result['value'])
+            return result
+
+
+        except Exception as e:
+            print(f'Ошибка get_lessons: {e}')
+
+    def get_admins(self):
+        try:
+            tb_name = f"{self.get_class()}_class"
+            with self.conn.cursor() as cursor:
+                cursor.execute(f"SELECT `value` FROM `{tb_name}` WHERE `key` = 'admins'")
+                result = cursor.fetchone()
+                return json.loads(result['value'])
+        except Exception as e:
+            logging.error(f'Ошибка get_admins: {e}')
+            return None
+
     def get_all_homework(self, class_name, date: str) -> dict:
         try:
-            array = {}
-            with open('schedule.json') as file:
-                array = json.loads(file.read())
+            
             dates = list(map(int, date.split('.')))
             try:
                 dat_of_week = datetime.datetime(year=datetime.datetime.now().year, month=dates[1], day=dates[0]).isoweekday()
             except ValueError:
                 return {}
-            lessons = array[class_name][days_of_week[dat_of_week]]
+            lessons = self.get_lessons()[dat_of_week]
             array = {}
             for lesson in lessons:
                 homework = self.get_homework(class_name, lesson)
