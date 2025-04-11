@@ -75,7 +75,6 @@ def is_lesson_in_date(lesson: str, date: str, class_name: str) -> bool:
 
 def is_admin(uid: int) -> bool:
     db = database.Connect(uid)
-    class_name = db.get_class()
     res = db.get_admins()
     return (uid == res['own']) or (uid in res['admins'])
 
@@ -91,11 +90,11 @@ async def get_hw(homework, ms: Message | None = None, bot: Bot | None = None, ui
             res.append(f'{lesson} - {hw}')
         if res:
             for i in res:
+                print(i, "123")
                 text = f"{i[:i.index("-")-1]}:"
                 hw = i[i.index("-")+2:]
                 array_hw = json.loads(hw.replace("'", '"'))
                 if any(isinstance(item, list) for item in array_hw):
-                    print(i)
                     photo_ids = []
                     for j in array_hw:
                         if isinstance(j, str):

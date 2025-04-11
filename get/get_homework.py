@@ -30,7 +30,7 @@ async def get_homework(ms: Message):
         weekday = ms.text.split()[-1]
         date = get_prope_date(weekday)
         homeworks = db.get_all_homework(class_name, date)
-
+    print(homeworks)
     await get_hw(homeworks, ms=ms)
 
 

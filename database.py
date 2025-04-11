@@ -154,9 +154,8 @@ class Connect:
                 cursor.execute(f"SELECT `value` FROM `{tb_name}` WHERE `key` = %s", ("schedule", ))
                 result = cursor.fetchone()
             result = json.loads(result['value'])
+            print(result)
             return result
-
-
         except Exception as e:
             print(f'Ошибка get_lessons: {e}')
 
@@ -173,13 +172,12 @@ class Connect:
 
     def get_all_homework(self, class_name, date: str) -> dict:
         try:
-            
             dates = list(map(int, date.split('.')))
             try:
                 dat_of_week = datetime.datetime(year=datetime.datetime.now().year, month=dates[1], day=dates[0]).isoweekday()
             except ValueError:
                 return {}
-            lessons = self.get_lessons()[dat_of_week]
+            lessons = self.get_lessons()[days_of_week[dat_of_week]]
             array = {}
             for lesson in lessons:
                 homework = self.get_homework(class_name, lesson)
