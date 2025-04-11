@@ -1,5 +1,6 @@
 from aiogram import Router
 
+from add import add_admin
 import add.add_homework as add_homework
 import others.fast_hendler as fast_hendler
 import get.get_homework as get_homework
@@ -16,3 +17,4 @@ router.include_router(help.router)
 router.include_router(start.router)
 router.include_router(last_marks.router)
 router.include_router(photo_save.router)
+router.include_router(add_admin.router)

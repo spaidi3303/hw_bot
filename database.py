@@ -250,3 +250,43 @@ class Connect:
         with self.conn.cursor() as cursor:       
             cursor.execute(update_query, (json.dumps(hw, ensure_ascii=False), (lesson)))
             self.conn.commit()
+
+    def add_admin(self, uid):
+        try:
+            class_ = self.get_class()
+                
+            with self.conn.cursor() as cursor:
+                cursor.execute(f"SELECT `value` FROM `{class_}_class` WHERE `key` = 'admins'")
+                array = json.loads(cursor.fetchone()['value'])['admins']
+
+            array.append(uid)
+            js = {"own": self.id, "admins": array}
+            with self.conn.cursor() as cursor:
+                update_query = f"UPDATE `{class_}_class` SET `value` = %s WHERE `key` = %s"
+                cursor.execute(update_query, (json.dumps(js), "admins"))
+                self.conn.commit()
+                
+        except Exception as e:
+            logging.error(f'Ошибка add_admin: {e}')
+            return False
+    
+
+    def del_admin(self, uid):
+        try:
+            class_ = self.get_class()
+                
+            with self.conn.cursor() as cursor:
+                cursor.execute(f"SELECT `value` FROM `{class_}_class` WHERE `key` = 'admins'")
+                array = json.loads(cursor.fetchone()['value'])['admins']
+
+            array.remove(uid)
+            js = {"own": self.id, "admins": array}
+            with self.conn.cursor() as cursor:
+                update_query = f"UPDATE `{class_}_class` SET `value` = %s WHERE `key` = %s"
+                cursor.execute(update_query, (json.dumps(js), "admins"))
+                self.conn.commit()
+                
+        except Exception as e:
+            logging.error(f'Ошибка add_admin: {e}')
+            return False
+    
