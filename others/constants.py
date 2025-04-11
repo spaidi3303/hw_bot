@@ -69,5 +69,12 @@ WEEKDAYS_DB = {
     "wednesday": "ср",
     "thursday": "чт",
     "friday": "пт",
-    "saturday": "сб"
+    "saturday": "сб",
+    "sunday": "вс"
+}
+
+OWN_CLASS = {
+    "10_a": 2098644058,
+    "10_b": 5472687359,
+    "10_v": 5191932879
 }

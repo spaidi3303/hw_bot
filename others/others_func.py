@@ -3,14 +3,15 @@ from datetime import date, datetime, timedelta
 import json
 import logging
 from queue import Empty
+import re
 
 from aiogram import Bot
 from aiogram.types import Message
 from aiogram.utils.media_group import MediaGroupBuilder
-from others.constants import LESSONS, SHORTCUTS
+from others.constants import LESSONS, OWN_CLASS, SHORTCUTS
 import database
 
-days_of_week = {1: 'пн', 2: 'вт', 3: 'ср', 4: 'чт', 5: 'пт', 6: 'сб', 7: "вс"}
+days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
 
 WEEKDAYS_DICT = {
     'понедельник': calendar.MONDAY,
@@ -23,14 +24,7 @@ WEEKDAYS_DICT = {
 
 
 def get_closest_lesson(lesson: str, class_name: str) -> str:
-    db = database.Connect(1)
-    all_id = db.get_all_id()
-    del db
-    uid = ""
-    for i in all_id:
-        if db.get_class_id(i) == class_name:
-            uid = i
-    db = database.Connect(uid)
+    db = database.Connect(OWN_CLASS[class_name])
     array = db.get_lessons()
     day_interval = 1
     while True:
@@ -61,14 +55,7 @@ def get_lesson_full_name(lesson: str) -> str | None:
 def is_lesson_in_date(lesson: str, date: str, class_name: str) -> bool:
     dates = list(map(int, date.split('.')))
     weekday = days_of_week[datetime(year=datetime.now().year, month=dates[1], day=dates[0]).isoweekday()]
-    db = database.Connect(1)
-    all_id = db.get_all_id()
-    del db
-    uid = ""
-    for i in all_id:
-        if db.get_class_id(i) == class_name:
-            uid = i
-    db = database.Connect(uid)
+    db = database.Connect(OWN_CLASS[class_name])
     lessons = db.get_lessons()[weekday]
     return lesson in lessons
 
@@ -90,7 +77,14 @@ async def get_hw(homework, ms: Message | None = None, bot: Bot | None = None, ui
             res.append(f'{lesson} - {hw}')
         if res:
             for i in res:
-                print(i, "123")
+                if re.findall(r"\d\d\.\d\d", i):
+                    idate = i.split("-")[0].strip()
+                    today = datetime.now()
+                    current_year = today.year
+                    date = datetime.strptime(f"{current_year}-{idate.split(".")[1]}-{idate.split(".")[0]}", "%Y-%m-%d")
+                    if date < today:
+                        continue
+                
                 text = f"{i[:i.index("-")-1]}:"
                 hw = i[i.index("-")+2:]
                 array_hw = json.loads(hw.replace("'", '"'))

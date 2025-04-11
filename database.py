@@ -8,7 +8,7 @@ import os
 from others.constants import LESSONS, WEEKDAYS_DB
 from others.others_func import get_lesson_full_name
 
-days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday'}
+days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
 
 load_dotenv("secret.env")  # Загружает переменные из файла
 # token = os.getenv("token")
@@ -94,6 +94,7 @@ class Connect:
 
     def create_user(self, class_name):
         self.check_table(class_name)
+        self.check_table(class_name+"_class")
         query = "INSERT INTO `Users` (userid, class) VALUES (%s, %s)"
         with self.conn.cursor() as cursor:
             cursor.execute(query, (self.id, class_name))
@@ -154,7 +155,7 @@ class Connect:
                 cursor.execute(f"SELECT `value` FROM `{tb_name}` WHERE `key` = %s", ("schedule", ))
                 result = cursor.fetchone()
             result = json.loads(result['value'])
-            print(result)
+
             return result
         except Exception as e:
             print(f'Ошибка get_lessons: {e}')
