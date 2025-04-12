@@ -21,16 +21,14 @@ async def get_homework(ms: Message):
     class_name = db.get_class()
     text = ms.text.lower()
     if text == 'дз':
-        tomorrow = datetime.now() + timedelta(days=1)
-        homeworks = db.get_all_homework(class_name, tomorrow.strftime('%d.%m'))
+        date = (datetime.now() + timedelta(days=1)).strftime('%d.%m')
     elif re.fullmatch(r'^дз \d\d\.\d\d$', text):
         date = ms.text.split()[-1]
-        homeworks = db.get_all_homework(class_name, date)
     elif re.fullmatch(fr'^дз ({'|'.join(WEEKDAYS)})$', text):
         weekday = ms.text.split()[-1]
         date = get_prope_date(weekday)
-        homeworks = db.get_all_homework(class_name, date)
-    await get_hw(homeworks, ms=ms)
+    homeworks = db.get_all_homework(class_name, date)
+    await get_hw(homeworks, ms.from_user.id, ms=ms)
 
 
 @router.message(F.text.lower().regexp(f'^дз ({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())})$'))
@@ -43,8 +41,14 @@ async def get_homework_keyboard(ms: Message):
         await ms.answer("По этому предмету нет дз")
         return
     homework = db.get_homework(db.get_class(), get_lesson_full_name(lesson))
-    res = []
-    for lesson, hw in homework.items():
-        res.append(f'{lesson} - {hw}')
         
-    await get_hw(homework, ms=ms)
+    await get_hw(homework, ms.from_user.id, ms=ms)
+
+@router.message(F.text.lower() == "дз профмат")
+async def get_profmat_hw(ms: Message):
+    try:
+        db = database.Connect(ms.from_user.id)
+        homework = db.get_hw_profmat()
+        await get_hw(homework, ms.from_user.id, ms=ms)
+    except Exception as e:
+        print(f'Ошибка get_profmat_hw: {e}')

@@ -4,14 +4,14 @@ import json
 import logging
 from queue import Empty
 import re
-
 from aiogram import Bot
 from aiogram.types import Message
 from aiogram.utils.media_group import MediaGroupBuilder
-from others.constants import LESSONS, OWN_CLASS, SHORTCUTS
+from others.constants import LESSONS, OWN_CLASS, OWN_ID, SHORTCUTS
 import database
 
-days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
+days_of_week = {1: 'mondayuidsprof', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
+
 
 WEEKDAYS_DICT = {
     'понедельник': calendar.MONDAY,
@@ -66,11 +66,7 @@ def is_admin(uid: int) -> bool:
     return (uid == res['own']) or (uid in res['admins'])
 
 
-async def get_hw(homework, ms: Message | None = None, bot: Bot | None = None, uid: int | None = None):
-    """
-    Если задан ms - сообщения будут отсылаться командой await ms.answer(...)
-    Если bot и uid - await bot.send_message(uid, ...)
-    """
+async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None = None):
     try:
         res = []
         for lesson, hw in homework.items():
@@ -127,5 +123,6 @@ async def get_hw(homework, ms: Message | None = None, bot: Bot | None = None, ui
                 await ms.answer('Нет дз')
             else:
                 await bot.send_message(uid, 'Нет дз')
+            
     except Exception as e:
         logging.error(f'Ошибка get_hw_other: {e}')

@@ -316,7 +316,9 @@ class Connect:
             with self.conn.cursor() as cursor:
                 cursor.execute("SELECT `value` FROM `profmat`")
                 result = cursor.fetchall()
-            return json.loads(result[1]["value"])
+                array_hw = json.loads(result[1]['value'])
+                
+            return array_hw
         
         except Exception as e:
             print(f'Ошибка get_hw_profmat: {e}')
@@ -324,7 +326,6 @@ class Connect:
     def add_hw_profmat(self, hw: str, date: str):
         try:
             homework = self.get_hw_profmat()
-            print(hw)
             array = []
             try:
                 for i in homework[date]:
