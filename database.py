@@ -242,7 +242,6 @@ class Connect:
             cursor.execute(query, (login, password, self.id))
             self.conn.commit()
 
-            print(hw)
     def get_all_id(self):
         with self.conn.cursor() as cursor:
             cursor.execute("SELECT userid FROM Users")
