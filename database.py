@@ -81,7 +81,18 @@ class Connect:
                 with self.conn.cursor() as cursor:
                     cursor.execute(insert_query, ("admins", json.dumps(js_admins, ensure_ascii=False)))
                     self.conn.commit()
-
+            elif db_name == "profmat":
+                print(1)
+                command = "(id INT AUTO_INCREMENT PRIMARY KEY, `key` VARCHAR(255) UNIQUE, `value` TEXT)"
+                with self.conn.cursor() as cursor:
+                    cursor.execute(f"CREATE TABLE IF NOT EXISTS `{db_name}` {command}")
+                    self.conn.commit()
+                profmat_id = [2098644058, 5191932879, 1752185553, 5407189672, 6891657794, 7502257293, 5806734924, 5472687359, 6324042999, 2076998769]
+                insert_query = f"INSERT INTO `{db_name}` (`key`, `value`) VALUES (%s, %s)"
+                with self.conn.cursor() as cursor:
+                    cursor.execute(insert_query, ("uids", json.dumps(profmat_id)))
+                    cursor.execute(insert_query, ("hw", json.dumps({})))
+                    self.conn.commit()
         except Exception as e:
             ...
 
@@ -231,6 +242,7 @@ class Connect:
             cursor.execute(query, (login, password, self.id))
             self.conn.commit()
 
+            print(hw)
     def get_all_id(self):
         with self.conn.cursor() as cursor:
             cursor.execute("SELECT userid FROM Users")
@@ -290,3 +302,43 @@ class Connect:
             logging.error(f'Ошибка add_admin: {e}')
             return False
     
+
+    def get_profmat_ids(self) -> list:
+        try:
+            with self.conn.cursor() as cursor:
+                cursor.execute("SELECT `value` FROM `profmat`")
+                result = cursor.fetchall()
+            return json.loads(result[0]["value"])
+        except Exception as e:
+            print(f'Ошибка get_profmat_ids: {e}')   
+
+    def get_hw_profmat(self) -> dict:
+        try:
+            with self.conn.cursor() as cursor:
+                cursor.execute("SELECT `value` FROM `profmat`")
+                result = cursor.fetchall()
+            return json.loads(result[1]["value"])
+        
+        except Exception as e:
+            print(f'Ошибка get_hw_profmat: {e}')
+
+    def add_hw_profmat(self, hw: str, date: str):
+        try:
+            homework = self.get_hw_profmat()
+            print(hw)
+            array = []
+            try:
+                for i in homework[date]:
+                    array.append(i)
+            except KeyError:
+                pass
+
+            array.append(hw)
+            homework[date] = array
+            update_query = f"UPDATE `profmat` SET `value` = %s WHERE `key` = %s"
+            with self.conn.cursor() as cursor:       
+                cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), ("hw")))
+                self.conn.commit()
+
+        except Exception as e:
+            print(f'Ошибка add_hw_profmat: {e}')

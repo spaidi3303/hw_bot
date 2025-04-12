@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from others.constants import LESSONS, SHORTCUTS, WEEKDAYS
 import database
+from datetime import datetime, timedelta
 from others.others_func import get_closest_lesson, get_lesson_full_name, get_prope_date, is_admin, is_lesson_in_date
 
 router = Router()
@@ -17,9 +18,6 @@ class PhotoAlbumState(StatesGroup):
 
 @router.message(F.photo)
 async def handle_photo_album(message: Message, state: FSMContext):
-    if not is_admin(message.from_user.id):
-        await message.answer("Ты не админ!")
-        return
     current_data = await state.get_data()
     if "photos" not in current_data:
         await state.update_data(photos=[], caption=None)
@@ -41,7 +39,6 @@ async def handle_photo_album(message: Message, state: FSMContext):
 
 
 async def add_homework_photos(caption: str, photos: list, message: Message):
-    print(photos)
     db = database.Connect(message.from_user.id)
     lesson = ""
     date = ""
@@ -59,6 +56,24 @@ async def add_homework_photos(caption: str, photos: list, message: Message):
         date = get_prope_date(weekday)
         lesson = caption[:caption.find(weekday)]
         lesson = get_lesson_full_name(lesson)
+    elif re.findall(f"профмат", caption.lower()):
+        print(1)
+        if re.fullmatch("^профмат$", caption.lower()):
+            today = datetime.today() + timedelta(1)
+            date = (today + timedelta((5 - today.weekday() + 7) % 7)).strftime("%d.%m")
+        elif re.fullmatch(r"профмат \d\d\.\d\d", caption.lower()):
+            date = re.findall(r"\d\d\.\d\d", caption)[0]
+            month = int(date.split('.')[1])
+            day = int(date.split('.')[0])
+            dat = datetime(datetime.now().year,month, day).isoweekday()
+            if dat != 6:
+                await message.answer("Выбранная дата не суббота!")
+                return
+        db = database.Connect(message.from_user.id)
+        db.add_hw_profmat(photos, date)
+        await message.answer(f"Домашнее задание по профмат было добавлено на {date}")
+        return
+
     else:
         return
     if not is_lesson_in_date(lesson, date, class_name):
