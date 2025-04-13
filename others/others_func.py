@@ -10,7 +10,7 @@ from aiogram.utils.media_group import MediaGroupBuilder
 from others.constants import LESSONS, OWN_CLASS, OWN_ID, SHORTCUTS
 import database
 
-days_of_week = {1: 'mondayuidsprof', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
+days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
 
 
 WEEKDAYS_DICT = {
@@ -30,6 +30,7 @@ def get_closest_lesson(lesson: str, class_name: str) -> str:
     while True:
         date = (datetime.now() + timedelta(day_interval))
         day_week = days_of_week[date.isoweekday()]
+        print(day_week)
         if lesson in array[day_week]:
             return date.strftime('%d.%m')
         day_interval = day_interval + 1
