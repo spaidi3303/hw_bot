@@ -84,7 +84,9 @@ async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None
                 
                 text = f"{i[:i.index("-")-1]}:"
                 hw = i[i.index("-")+2:]
+                hw = hw.replace('"', "*")
                 array_hw = json.loads(hw.replace("'", '"'))
+
                 if any(isinstance(item, list) for item in array_hw):
                     photo_ids = []
                     for j in array_hw:
@@ -110,7 +112,6 @@ async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None
                                 chat_id=uid,
                                 media=album_builder.build()
                             )
-
                 else:
                     for j in array_hw:
                         text += f"\n- {j}"
@@ -125,5 +126,8 @@ async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None
             else:
                 await bot.send_message(uid, 'Нет дз')
             
-    except Exception as e:
-        logging.error(f'Ошибка get_hw_other: {e}')
+    # except Exception as e:
+    #     logging.error(f'Ошибка get_hw_other: {e}')
+
+    finally:
+        ...
