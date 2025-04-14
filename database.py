@@ -342,3 +342,13 @@ class Connect:
 
         except Exception as e:
             print(f'Ошибка add_hw_profmat: {e}')
+
+
+    def get_all_from_table(self, table_name):
+        try:
+            with self.conn.cursor() as cursor:
+                cursor.execute(f"SeLECT * FROM {table_name}")
+                result = cursor.fetchall()
+                return result
+        except Exception as e:
+            print(f'Ошибка get_all_from_table: {e}')
