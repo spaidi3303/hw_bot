@@ -165,6 +165,7 @@ class Connect:
             with self.conn.cursor() as cursor:
                 cursor.execute(f"SELECT `value` FROM `{tb_name}` WHERE `key` = %s", ("schedule", ))
                 result = cursor.fetchone()
+                print(result)
             result = json.loads(result['value'])
 
             return result

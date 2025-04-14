@@ -37,7 +37,6 @@ async def on_startup():
 
 
 async def main():
-    await bot(DeleteWebhook(drop_pending_updates=True))
     logging.basicConfig(level=logging.INFO)
     await dp.start_polling(bot)
 
