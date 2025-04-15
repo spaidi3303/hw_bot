@@ -9,5 +9,6 @@ dependencies = [
     "apscheduler",
     "pymysql",
     "playwright",
-    "dotenv"
+    "dotenv",
+    "cryptography"
 ]
