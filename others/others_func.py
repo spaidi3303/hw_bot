@@ -6,6 +6,7 @@ from queue import Empty
 import re
 from aiogram import Bot
 from aiogram.types import Message
+from aiogram.filters import Filter
 from aiogram.utils.media_group import MediaGroupBuilder
 from others.constants import LESSONS, OWN_CLASS, OWN_ID, SHORTCUTS
 import database
@@ -30,7 +31,6 @@ def get_closest_lesson(lesson: str, class_name: str) -> str:
     while True:
         date = (datetime.now() + timedelta(day_interval))
         day_week = days_of_week[date.isoweekday()]
-        print(day_week)
         if lesson in array[day_week]:
             return date.strftime('%d.%m')
         day_interval = day_interval + 1
@@ -60,12 +60,12 @@ def is_lesson_in_date(lesson: str, date: str, class_name: str) -> bool:
     lessons = db.get_lessons()[weekday]
     return lesson in lessons
 
-
-def is_admin(uid: int) -> bool:
-    db = database.Connect(uid)
-    res = db.get_admins()
-    return (uid == res['own']) or (uid in res['admins'])
-
+class is_admin(Filter):  
+    async def __call__(self, message: Message):
+        uid = message.from_user.id
+        db = database.Connect(uid)
+        res = db.get_admins()
+        return (uid == res['own']) or (uid in res['admins'])
 
 async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None = None):
 

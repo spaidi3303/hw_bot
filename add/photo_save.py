@@ -7,7 +7,7 @@ from aiogram.fsm.state import StatesGroup, State
 from others.constants import LESSONS, SHORTCUTS, WEEKDAYS
 import database
 from datetime import datetime, timedelta
-from others.others_func import get_closest_lesson, get_lesson_full_name, get_prope_date, is_admin, is_lesson_in_date
+from others.others_func import *
 
 router = Router()
 
@@ -16,7 +16,7 @@ class PhotoAlbumState(StatesGroup):
     waiting_for_album = State()  # Состояние для сбора альбома
 
 
-@router.message(F.photo)
+@router.message(F.photo, is_admin())
 async def handle_photo_album(message: Message, state: FSMContext):
     current_data = await state.get_data()
     if "photos" not in current_data:
@@ -57,7 +57,6 @@ async def add_homework_photos(caption: str, photos: list, message: Message):
         lesson = caption[:caption.find(weekday)]
         lesson = get_lesson_full_name(lesson)
     elif re.findall(f"профмат", caption.lower()):
-        print(1)
         if re.fullmatch("^профмат$", caption.lower()):
             today = datetime.today() + timedelta(1)
             date = (today + timedelta((5 - today.weekday() + 7) % 7)).strftime("%d.%m")

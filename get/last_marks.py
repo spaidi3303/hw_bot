@@ -111,7 +111,6 @@ async def password_input(ms: Message, state: FSMContext):
     if ps:
         await ms.answer("Ваши данные были сохранены. Можете просматривать оценки")
         db = database.Connect(ms.from_user.id)
-        print(res['password'])
         db.update_login_password(res['login'], res['password'])
     else:
         await ms.answer("Ваши данные не коректны! Перепроверьте логин и пароль")

@@ -13,15 +13,13 @@ router = Router()
 @router.message(
     F.text.regexp(f"({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) - .*", flags=re.I) |
     F.text.regexp(fr"({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) \d\d\.\d\d - .*", flags=re.I) |
-    F.text.regexp(fr"({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) ({'|'.join(WEEKDAYS)}) - .*", flags=re.I)
+    F.text.regexp(fr"({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())}) ({'|'.join(WEEKDAYS)}) - .*", flags=re.I),
+    is_admin()
 )
 async def add_homework_simple_format(message: Message):
     lesson = message.text[: message.text.find('-')].strip()
     homework = message.text[message.text.find('-')+2:].strip()
     db = database.Connect(message.from_user.id)
-    if not is_admin(message.from_user.id):
-        await message.answer("Ты не админ!")
-        return
     class_name = db.get_class()
     text =  message.text.lower().replace('\n', ' ')
     

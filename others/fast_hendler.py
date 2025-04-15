@@ -48,7 +48,6 @@ async def list_users(ms: types.Message):
 @router.message(F.text.lower().regexp("таблица .*"), F.from_user.id == OWN_ID[0])
 async def get_table(ms: types.Message):
     table_name = ms.text.split()[1]
-    print(table_name)
     db = database.Connect(OWN_ID[0])
     res = db.get_all_from_table(table_name)
     for i in res:

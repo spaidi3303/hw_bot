@@ -82,7 +82,6 @@ class Connect:
                     cursor.execute(insert_query, ("admins", json.dumps(js_admins, ensure_ascii=False)))
                     self.conn.commit()
             elif db_name == "profmat":
-                print(1)
                 command = "(id INT AUTO_INCREMENT PRIMARY KEY, `key` VARCHAR(255) UNIQUE, `value` TEXT)"
                 with self.conn.cursor() as cursor:
                     cursor.execute(f"CREATE TABLE IF NOT EXISTS `{db_name}` {command}")
@@ -165,7 +164,6 @@ class Connect:
             with self.conn.cursor() as cursor:
                 cursor.execute(f"SELECT `value` FROM `{tb_name}` WHERE `key` = %s", ("schedule", ))
                 result = cursor.fetchone()
-                print(result)
             result = json.loads(result['value'])
 
             return result
