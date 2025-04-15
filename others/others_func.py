@@ -68,66 +68,60 @@ def is_admin(uid: int) -> bool:
 
 
 async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None = None):
-    try:
-        res = []
-        for lesson, hw in homework.items():
-            res.append(f'{lesson} - {hw}')
-        if res:
-            for i in res:
-                if re.findall(r"\d\d\.\d\d", i):
-                    idate = i.split("-")[0].strip()
-                    today = datetime.now()
-                    current_year = today.year
-                    date = datetime.strptime(f"{current_year}-{idate.split(".")[1]}-{idate.split(".")[0]}", "%Y-%m-%d")
-                    if date < today:
-                        continue
-                
-                text = f"{i[:i.index("-")-1]}:"
-                hw = i[i.index("-")+2:]
-                hw = hw.replace('"', "*")
-                array_hw = json.loads(hw.replace("'", '"'))
 
-                if any(isinstance(item, list) for item in array_hw):
-                    photo_ids = []
-                    for j in array_hw:
-                        if isinstance(j, str):
-                            text += f"\n- {j}"
-                        elif isinstance(j, list):
-                            for file_id in j:
-                                photo_ids.append(file_id)
-                    if photo_ids is not Empty:
-                        album_builder = MediaGroupBuilder(
-                            caption=text
-                        )
-                        for fi_id in photo_ids:
-                            album_builder.add_photo(
-                                media=fi_id
-                            )
-                        if ms is not None:
-                            await ms.answer_media_group(
-                                media=album_builder.build()
-                            )
-                        else:
-                            await bot.send_media_group(
-                                chat_id=uid,
-                                media=album_builder.build()
-                            )
-                else:
-                    for j in array_hw:
-                        text += f"\n- {j}"
-                    else:
-                        if ms is not None:
-                            await ms.answer(text)
-                        else:
-                            await bot.send_message(uid, text)
-        else:
-            if ms is not None:
-                await ms.answer('Нет дз')
-            else:
-                await bot.send_message(uid, 'Нет дз')
+    res = []
+    for lesson, hw in homework.items():
+        res.append(f'{lesson} - {hw}')
+    if res:
+        for i in res:
+            if re.findall(r"\d\d\.\d\d", i):
+                idate = i.split("-")[0].strip()
+                today = datetime.now()
+                current_year = today.year
+                date = datetime.strptime(f"{current_year}-{idate.split(".")[1]}-{idate.split(".")[0]}", "%Y-%m-%d")
+                if date < today:
+                    continue
             
-    # except Exception as e:
-    #     logging.error(f'Ошибка get_hw_other: {e}')
+            text = f"{i[:i.index("-")-1]}:"
+            hw = i[i.index("-")+2:]
+            hw = hw.replace('"', "*")
+            array_hw = json.loads(hw.replace("'", '"'))
 
-    finally:
-        ...
+            if any(isinstance(item, list) for item in array_hw):
+                photo_ids = []
+                for j in array_hw:
+                    if isinstance(j, str):
+                        text += f"\n- {j}"
+                    elif isinstance(j, list):
+                        for file_id in j:
+                            photo_ids.append(file_id)
+                if photo_ids is not Empty:
+                    album_builder = MediaGroupBuilder(
+                        caption=text
+                    )
+                    for fi_id in photo_ids:
+                        album_builder.add_photo(
+                            media=fi_id
+                        )
+                    if ms is not None:
+                        await ms.answer_media_group(
+                            media=album_builder.build()
+                        )
+                    else:
+                        await bot.send_media_group(
+                            chat_id=uid,
+                            media=album_builder.build()
+                        )
+            else:
+                for j in array_hw:
+                    text += f"\n- {j}"
+                else:
+                    if ms is not None:
+                        await ms.answer(text)
+                    else:
+                        await bot.send_message(uid, text)
+    else:
+        if ms is not None:
+            await ms.answer('Нет дз')
+        else:
+            await bot.send_message(uid, 'Нет дз')

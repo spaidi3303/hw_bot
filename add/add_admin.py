@@ -35,15 +35,10 @@ async def deladm_buttons(uid: int):
 
 @router.callback_query(AdminDel.filter())
 async def del_adm_yes(query: CallbackQuery, callback_data: AdminDel):
-    try:
-        print(1)
-        if callback_data.action == "yes":
-            print(2)
-            uid = callback_data.id
-            db = database.Connect(uid)
-            db.del_admin(uid)
-            await query.message.edit_text("Админ был удалён")
-        elif callback_data.action == "no":
-            await query.message.edit_text("Админ был оставлен")
-    except Exception as e:
-        print(f'Ошибка del_adm_yes: {e}')
+    if callback_data.action == "yes":
+        uid = callback_data.id
+        db = database.Connect(uid)
+        db.del_admin(uid)
+        await query.message.edit_text("Админ был удалён")
+    elif callback_data.action == "no":
+        await query.message.edit_text("Админ был оставлен")

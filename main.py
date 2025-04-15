@@ -8,7 +8,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from dotenv import load_dotenv
 from get.notifications import send_homework
 import others.routers as routers
-
+import error
 load_dotenv("secret.env") 
 TOKEN = os.getenv("token")
 
@@ -17,7 +17,8 @@ bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 logging.basicConfig(level=logging.INFO)
 
 dp = Dispatcher()
-dp.include_router(routers.router)
+dp.include_routers(routers.router, error.router)
+
 
 async def send_homework_bot():
     await send_homework(bot)
