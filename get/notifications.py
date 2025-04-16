@@ -16,16 +16,18 @@ async def send_homework(bot: Bot):
         class_name = db.get_class_id(uid)
         tomorrow = datetime.now() + timedelta(days=1)
         homeworks = db.get_all_homework(class_name, tomorrow.strftime('%d.%m'))
-        await get_hw(homeworks, uid, bot=bot)
+        try:
+            await get_hw(homeworks, uid, bot=bot)
 
-        if uid in profid:
-            if tomorrow.isoweekday() == 6:
-                hw = db.get_hw_profmat()
-                text = "Профильная математика: \n"
-                try: 
-                    for hw_i in hw[tomorrow.strftime('%d.%m')]:
-                        text += f"- {hw_i}\n\n"
-                except:
-                    return
-                await bot.send_message(text)
-                
+            if uid in profid:
+                if tomorrow.isoweekday() == 6:
+                    hw = db.get_hw_profmat()
+                    text = "Профильная математика: \n"
+                    try: 
+                        for hw_i in hw[tomorrow.strftime('%d.%m')]:
+                            text += f"- {hw_i}\n\n"
+                    except:
+                        return
+                    await bot.send_message(text)
+        except:
+            ...
