@@ -7,6 +7,7 @@ from aiogram.enums.parse_mode import ParseMode
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from dotenv import load_dotenv
 from get.notifications import send_homework
+from others.constants import OWN_ID
 import others.routers as routers
 import error
 load_dotenv("secret.env") 
@@ -37,9 +38,10 @@ async def on_startup():
 
 
 async def main():
+    await bot.send_message(OWN_ID[0], "бот запущен")
     logging.basicConfig(level=logging.INFO)
     await dp.start_polling(bot)
-
+    await bot.send_message(OWN_ID[0], "бот выключен")
 if __name__ == "__main__":
     dp.startup.register(on_startup)
     asyncio.run(main())

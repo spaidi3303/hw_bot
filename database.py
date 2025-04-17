@@ -10,8 +10,7 @@ from others.others_func import get_lesson_full_name
 
 days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
 
-load_dotenv("secret.env")  # Загружает переменные из файла
-# token = os.getenv("token")
+load_dotenv("secret.env")
 database = os.getenv("database")
 host = os.getenv("host")
 password = os.getenv("password")
@@ -303,6 +302,7 @@ class Connect:
 
     def get_profmat_ids(self) -> list:
         try:
+            self.check_table("profmat")
             with self.conn.cursor() as cursor:
                 cursor.execute("SELECT `value` FROM `profmat`")
                 result = cursor.fetchall()
@@ -312,6 +312,7 @@ class Connect:
 
     def get_hw_profmat(self) -> dict:
         try:
+            self.check_table("profmat")
             with self.conn.cursor() as cursor:
                 cursor.execute("SELECT `value` FROM `profmat`")
                 result = cursor.fetchall()
@@ -324,6 +325,7 @@ class Connect:
 
     def add_hw_profmat(self, hw: str, date: str):
         try:
+            self.check_table("profmat")
             homework = self.get_hw_profmat()
             array = []
             try:
@@ -346,7 +348,7 @@ class Connect:
     def get_all_from_table(self, table_name):
         try:
             with self.conn.cursor() as cursor:
-                cursor.execute(f"SeLECT * FROM {table_name}")
+                cursor.execute(f"SELECT * FROM {table_name}")
                 result = cursor.fetchall()
                 return result
         except Exception as e:
