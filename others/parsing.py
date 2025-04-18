@@ -5,7 +5,7 @@ import re
 async def log_ps(login: str, password: str) -> bool:
     try:
         async with async_playwright() as p:
-            browser = await p.firefox.launch(headless=True)
+            browser = await p.chromium.launch(headless=True)
             page = await browser.new_page()
             await page.goto('https://dnevnik.pravgym.ru/')
             login_field = page.locator('input[name=login]')
@@ -23,7 +23,7 @@ async def log_ps(login: str, password: str) -> bool:
 async def parse(login: str, password: str) -> list[str, str, int]:
     async with async_playwright() as p:
         date = get_trimestr()
-        browser = await p.firefox.launch(headless=True)
+        browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         await page.goto('https://dnevnik.pravgym.ru/')
         login_field = page.locator('input[name=login]')
@@ -49,7 +49,7 @@ async def parse(login: str, password: str) -> list[str, str, int]:
 async def parse_all(login: str, password: str) -> list[str, str, int]:
     async with async_playwright() as p:
         date = get_trimestr()
-        browser = await p.firefox.launch(headless=True)
+        browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         await page.goto('https://dnevnik.pravgym.ru/')
         login_field = page.locator('input[name=login]')
