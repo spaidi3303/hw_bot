@@ -39,9 +39,10 @@ USER_HELP = f'{HW_GET_HELP}\n{GET_MARKS_HELP}\n{NOTE}'
 ADMIN_HELP = f'{HW_GET_HELP}\n{HW_ADD_HELP}\n{GET_MARKS_HELP}\n{NOTE}'
 
 
-@router.message(F.text == '/help')
+@router.message(F.text == '/help', is_admin())
 async def doc(message: Message):
-    if is_admin(message.from_user.id):
-        await message.answer(ADMIN_HELP, parse_mode=ParseMode.MARKDOWN_V2)
-    else:
-        await message.answer(USER_HELP, parse_mode=ParseMode.MARKDOWN_V2)
+    await message.answer(ADMIN_HELP, parse_mode=ParseMode.MARKDOWN_V2)
+
+@router.message(F.text == "/help")
+async def doc_no(message: Message):
+    await message.answer(USER_HELP, parse_mode=ParseMode.MARKDOWN_V2)
