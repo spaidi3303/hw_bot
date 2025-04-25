@@ -24,10 +24,7 @@ class ActionListClasses(CallbackData, prefix="class"):
 async def start(message: Message):
     db = database.Connect(message.from_user.id)
     if db.user_exists():
-        if is_admin(message.from_user.id):
-            await message.answer(ADMIN_HELP, parse_mode=ParseMode.MARKDOWN_V2)
-        else:
-            await message.answer(USER_HELP, parse_mode=ParseMode.MARKDOWN_V2)
+        await message.answer("Для помощи напиши /help")
     else:
         
         await message.answer('Привет! Выбери свой класс:',
