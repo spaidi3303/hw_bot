@@ -1,4 +1,4 @@
-from aiogram import Router, F, types
+from aiogram import Router, F
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.keyboard import CallbackData, InlineKeyboardBuilder, InlineKeyboardButton
 
@@ -8,7 +8,7 @@ import database
 router = Router()
 
 @router.message(F.contact)
-async def add_contact(ms: types.Message):
+async def add_contact(ms: Message):
     uid = ms.from_user.id
     db = database.Connect(uid)
     if ms.contact.user_id in db.get_admins()['admins']:

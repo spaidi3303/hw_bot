@@ -76,7 +76,7 @@ async def add_homework_photos(caption: str, photos: list, message: Message):
     else:
         return
     if not is_lesson_in_date(lesson, date, class_name):
-            await message.answer(f"Урок {lesson} в указанный день не найден.")
-            return   
+        await message.answer(f"Урок {lesson} в указанный день не найден.")
+        return
     db.update_homework(class_name, lesson, date, photos)
     await message.answer(f"Домашнее задание было добавлено в {lesson} на {date}")

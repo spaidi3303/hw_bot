@@ -2,6 +2,7 @@ from datetime import datetime
 from playwright.async_api import async_playwright
 import re
 
+
 async def log_ps(login: str, password: str) -> bool:
     try:
         async with async_playwright() as p:
@@ -19,8 +20,7 @@ async def log_ps(login: str, password: str) -> bool:
         return False
 
 
-
-async def parse(login: str, password: str) -> list[str, str, int]:
+async def parse(login: str, password: str) -> list[tuple[str, str, int]]:
     async with async_playwright() as p:
         date = get_trimestr()
         browser = await p.chromium.launch(headless=True)
@@ -46,7 +46,7 @@ async def parse(login: str, password: str) -> list[str, str, int]:
         return grades
 
 
-async def parse_all(login: str, password: str) -> list[str, str, int]:
+async def parse_all(login: str, password: str) -> list[tuple[str, str, list]]:
     async with async_playwright() as p:
         date = get_trimestr()
         browser = await p.chromium.launch(headless=True)
@@ -61,7 +61,6 @@ async def parse_all(login: str, password: str) -> list[str, str, int]:
         await page.click('button[type=submit]')
         await page.locator('tr').first.wait_for()
         table_rows = (await page.locator('tr').all())[1:]
-        grades = []
         array = []
         for row in table_rows:
             array.append(await row.all_inner_texts())
@@ -80,7 +79,7 @@ async def parse_all(login: str, password: str) -> list[str, str, int]:
         return res_array
 
 
-def get_trimestr() -> datetime:
+def get_trimestr() -> str:
     today = datetime.now()
     current_year = today.year
     first_tr_date = datetime.strptime(f"{current_year}-09-01", "%Y-%m-%d")
