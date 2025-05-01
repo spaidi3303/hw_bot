@@ -3,8 +3,5 @@ __pycache__
 uv.lock
 test.py
 
-# wchistow
 .vscode/
-
-# Sammy
 .idea/
