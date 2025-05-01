@@ -218,7 +218,7 @@ class Connect:
         except Exception as e:
             logging.error(f'Ошибка get_all_dates: {e}')
 
-    def del_homework(self, lesson: str, date: str):
+    def clear_homework(self, lesson: str, date: str):
         class_name = self.get_class()
         homework = self.get_homework(class_name, lesson)
         del homework[date]
@@ -253,6 +253,19 @@ class Connect:
         with self.conn.cursor() as cursor:
             cursor.execute("DELETE FROM `Users` WHERE userid = %s", (self.id,))
             self.conn.commit()
+
+    def del_hw(self, date: str, lesson: str, index: str):
+        class_name = self.get_class()
+        try:
+            homework = self.get_homework(class_name, lesson)
+            homework[date].pop(index)
+
+            update_query = f"UPDATE {class_name} SET homework = %s WHERE lesson = %s"
+            with self.conn.cursor() as cursor:
+                cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), lesson))
+                self.conn.commit()
+        except Exception as e:
+            logging.error(f'Ошибка del_hw: {e}')
 
     def update_all_homework(self, class_, lesson, hw):
         update_query = f"UPDATE {class_} SET homework = %s WHERE lesson = %s"
