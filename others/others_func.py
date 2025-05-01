@@ -79,8 +79,8 @@ async def get_hw(homework, uid: int, ms: Message | None = None, bot: Bot | None 
                 idate = i.split("-")[0].strip()
                 today = datetime.now()
                 current_year = today.year
-                date = datetime.strptime(f"{current_year}-{idate.split(".")[1]}-{idate.split(".")[0]}", "%Y-%m-%d")
-                if date < today:
+                date_check = datetime.strptime(f"{current_year}-{idate.split(".")[1]}-{idate.split(".")[0]}", "%Y-%m-%d")
+                if date_check < today:
                     continue
 
             text = f"{i[:i.index("-")-1]}:"
@@ -100,7 +100,6 @@ async def get_hw(homework, uid: int, ms: Message | None = None, bot: Bot | None 
                     album_builder = MediaGroupBuilder(caption=text)
                     for fi_id in photo_ids:
                         album_builder.add_photo(media=fi_id)
-
                     await _send_media_group(album_builder.build(), uid, ms, bot)
             else:
                 db = database.Connect(uid)
@@ -126,6 +125,7 @@ def DelHw():
 
 async def _send_ms(text: str, uid: int, ms: Message | None, bot: Bot | None, **kwargs):
     if ms is not None:
+        print(text)
         await ms.answer(text, **kwargs)
     else:
         await bot.send_message(uid, text, **kwargs)

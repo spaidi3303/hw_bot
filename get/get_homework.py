@@ -20,6 +20,7 @@ async def get_homework(ms: Message):
     db = database.Connect(ms.from_user.id)
     class_name = db.get_class()
     text = ms.text.lower()
+    date = ""
     if text == 'дз':
         date = (datetime.now() + timedelta(days=1)).strftime('%d.%m')
     elif re.fullmatch(r'^дз \d\d\.\d\d$', text):
@@ -28,6 +29,7 @@ async def get_homework(ms: Message):
         weekday = ms.text.split()[-1]
         date = get_prope_date(weekday)
     homeworks = db.get_all_homework(class_name, date)
+    print(homeworks)
     await get_hw(homeworks, ms.from_user.id, ms=ms)
 
 

@@ -8,6 +8,7 @@ import others.help as help
 import get.last_marks as last_marks
 import add.photo_save as photo_save
 import others.start as start
+from get import del_hw
 from profmat import add
 
 router = Router()
@@ -20,3 +21,4 @@ router.include_router(last_marks.router)
 router.include_router(photo_save.router)
 router.include_router(add_admin.router)
 router.include_router(add.router)
+router.include_router(del_hw.router)
