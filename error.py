@@ -3,6 +3,8 @@ import traceback
 
 from aiogram import Bot, Router, types
 
+from others.constants import OWN_ID
+
 router = Router()
 
 
@@ -22,5 +24,5 @@ async def error_handler(event: types.ErrorEvent, bot: Bot):
         f"• Место:\n{tb_short}"
     )
     logging.error(error_summary)
-    await bot.send_message(2098644058, error_summary)
+    await bot.send_message(OWN_ID[0], error_summary)
     return True

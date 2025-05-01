@@ -1,15 +1,17 @@
 import asyncio
 import logging
 import os
+
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from dotenv import load_dotenv
+
 from get.notifications import send_homework
+import error
 from others.constants import OWN_ID
 import others.routers as routers
-import error
 
 load_dotenv("secret.env") 
 TOKEN = os.getenv("token")
