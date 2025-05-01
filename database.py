@@ -254,11 +254,11 @@ class Connect:
             cursor.execute("DELETE FROM `Users` WHERE userid = %s", (self.id,))
             self.conn.commit()
 
-    def del_hw(self, date: str, lesson: str, index: str):
+    def del_hw(self, date: str, lesson: str, index: int):
         class_name = self.get_class()
         try:
             homework = self.get_homework(class_name, lesson)
-            homework[date].pop(index)
+            homework[date].pop(index - 1)
 
             update_query = f"UPDATE {class_name} SET homework = %s WHERE lesson = %s"
             with self.conn.cursor() as cursor:
