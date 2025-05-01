@@ -29,8 +29,9 @@ async def get_homework(ms: Message):
         weekday = ms.text.split()[-1]
         date = get_prope_date(weekday)
     homeworks = db.get_all_homework(class_name, date)
-    print(homeworks)
-    await get_hw(homeworks, ms.from_user.id, ms=ms)
+    for lesson in homeworks.keys():
+        res = {lesson: homeworks[lesson]}
+        await get_hw(date, lesson, res, ms.from_user.id, ms=ms)
 
 
 @router.message(F.text.lower().regexp(f'^дз ({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())})$'))

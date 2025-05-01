@@ -41,10 +41,10 @@ async def on_startup():
 
 
 async def main():
-    await bot.send_message(OWN_ID[0], "бот запущен")
+    # await bot.send_message(OWN_ID[0], "бот запущен")
     logging.basicConfig(level=logging.INFO)
     await dp.start_polling(bot)
-    await bot.send_message(OWN_ID[0], "бот выключен")
+    # await bot.send_message(OWN_ID[0], "бот выключен")
 
 
 if __name__ == "__main__":

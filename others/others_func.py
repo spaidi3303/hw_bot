@@ -69,7 +69,7 @@ class is_admin(Filter):
         return (uid == res['own']) or (uid in res['admins'])
 
 
-async def get_hw(homework, uid: int, ms: Message | None = None, bot: Bot | None = None):
+async def get_hw(date_hw, lesson, homework, uid: int, ms: Message | None = None, bot: Bot | None = None):
     res = []
     for lesson, hw in homework.items():
         res.append(f'{lesson} - {hw}')
