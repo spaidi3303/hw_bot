@@ -1,16 +1,17 @@
 import calendar
 from datetime import date, datetime, timedelta
 import json
-from queue import Empty
 import re
-from aiogram import Bot
-from aiogram.types import Message
-from aiogram.filters import Filter
-from aiogram.utils.media_group import MediaGroupBuilder
-from others.constants import LESSONS, OWN_CLASS, SHORTCUTS
-import database
 
-from aiogram.utils.keyboard import CallbackData, InlineKeyboardBuilder, InlineKeyboardButton
+from aiogram import Bot
+from aiogram.filters import Filter
+from aiogram.types import Message
+from aiogram.utils.media_group import MediaGroupBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+import database
+from others.constants import LESSONS, OWN_CLASS, SHORTCUTS
+
 days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
 
 WEEKDAYS_DICT = {
@@ -68,7 +69,7 @@ class is_admin(Filter):
         return (uid == res['own']) or (uid in res['admins'])
 
 
-async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None = None):
+async def get_hw(homework, uid: int, ms: Message | None = None, bot: Bot | None = None):
     res = []
     for lesson, hw in homework.items():
         res.append(f'{lesson} - {hw}')
@@ -95,52 +96,43 @@ async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None
                     elif isinstance(j, list):
                         for file_id in j:
                             photo_ids.append(file_id)
-                if photo_ids is not Empty:
-                    album_builder = MediaGroupBuilder(
-                        caption=text
-                    )
+                if photo_ids:
+                    album_builder = MediaGroupBuilder(caption=text)
                     for fi_id in photo_ids:
-                        album_builder.add_photo(
-                            media=fi_id
-                        )
-                    if ms is not None:
-                        await ms.answer_media_group(
-                            media=album_builder.build()
-                        )
+                        album_builder.add_photo(media=fi_id)
 
-                    else:
-                        await bot.send_media_group(
-                            chat_id=uid,
-                            media=album_builder.build()
-                        )
+                    await _send_media_group(album_builder.build(), uid, ms, bot)
             else:
-                uid = ms.from_user.id
                 db = database.Connect(uid)
-                res = db.get_admins()
-                isAdmin =  (uid == res['own']) or (uid in res['admins'])
+                admins = db.get_admins()
+                isAdmin = uid in admins['admins'] or uid == admins['own']
                 del db
                 for j in array_hw:
                     text += f"\n- {j}"
                 else:
-                    if ms is not None:
-                        if isAdmin:
-                            await ms.answer(text, reply_markup=DelHw())
-                        else:
-                            await ms.answer(text)
+                    if isAdmin:
+                        await _send_ms(text, uid, ms, bot, reply_markup=DelHw())
                     else:
-                        if isAdmin:
-                            await bot.send_message(uid, text, reply_markup=DelHw())
-                        else:
-                            await bot.send_message(uid, text)
-
+                        await _send_ms(text, uid, ms, bot)
     else:
-        if ms is not None:
-            await ms.answer('Нет дз')
-        else:
-            await bot.send_message(uid, 'Нет дз')
+        await _send_ms('Нет дз', uid, ms, bot)
 
 
 def DelHw():
     builder = InlineKeyboardBuilder()
     builder.button(text="Удалить дз", callback_data="deldz")
     return builder.as_markup()
+
+
+async def _send_ms(text: str, uid: int, ms: Message | None, bot: Bot | None, **kwargs):
+    if ms is not None:
+        await ms.answer(text, **kwargs)
+    else:
+        await bot.send_message(uid, text, **kwargs)
+
+
+async def _send_media_group(media, uid: int, ms: Message | None, bot: Bot | None):
+    if ms is not None:
+        await ms.answer_media_group(media=media)
+    else:
+        await bot.send_media_group(chat_id=uid, media=media)
