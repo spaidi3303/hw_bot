@@ -10,7 +10,7 @@ from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 import database
-from others.constants import LESSONS, OWN_CLASS, SHORTCUTS
+from others.constants import LESSONS, OWN_CLASS, SHORTCUTS, RUSSIAN_LESSONS
 
 days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
 
@@ -102,6 +102,7 @@ async def get_hw(date_hw, lesson, homework, uid: int, ms: Message | None = None,
                         album_builder.add_photo(media=fi_id)
                     await _send_media_group(album_builder.build(), uid, ms, bot)
             else:
+                print(1)
                 db = database.Connect(uid)
                 admins = db.get_admins()
                 isAdmin = uid in admins['admins'] or uid == admins['own']
@@ -110,22 +111,22 @@ async def get_hw(date_hw, lesson, homework, uid: int, ms: Message | None = None,
                     text += f"\n- {j}"
                 else:
                     if isAdmin:
-                        await _send_ms(text, uid, ms, bot, reply_markup=DelHw())
+                        await _send_ms(text, uid, ms, bot, reply_markup=DelHw(date_hw, lesson))
                     else:
                         await _send_ms(text, uid, ms, bot)
     else:
         await _send_ms('Нет дз', uid, ms, bot)
 
 
-def DelHw():
+def DelHw(date_hw, lesson):
+    print(date_hw, lesson)
     builder = InlineKeyboardBuilder()
-    builder.button(text="Удалить дз", callback_data="deldz")
+    builder.button(text="Удалить дз", callback_data=f"deldz:{date_hw}:{RUSSIAN_LESSONS[lesson]}")
     return builder.as_markup()
 
 
 async def _send_ms(text: str, uid: int, ms: Message | None, bot: Bot | None, **kwargs):
     if ms is not None:
-        print(text)
         await ms.answer(text, **kwargs)
     else:
         await bot.send_message(uid, text, **kwargs)

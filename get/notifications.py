@@ -17,7 +17,9 @@ async def send_homework(bot: Bot):
         tomorrow = datetime.now() + timedelta(days=1)
         homeworks = db.get_all_homework(class_name, tomorrow.strftime('%d.%m'))
         try:
-            await get_hw(homeworks, uid, bot=bot)
+            for lesson in homeworks.keys():
+                res = {lesson: homeworks[lesson]}
+                await get_hw(tomorrow.strftime('%d.%m'), lesson, res, uid, bot=bot)
 
             if uid in profid:
                 if tomorrow.isoweekday() == 6:

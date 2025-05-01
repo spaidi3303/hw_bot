@@ -43,13 +43,18 @@ async def get_homework_keyboard(ms: Message):
     if all_dates.__len__() == 0:
         await ms.answer("По этому предмету нет дз")
         return
-    homework = db.get_homework(db.get_class(), get_lesson_full_name(lesson))
-        
-    await get_hw(homework, ms.from_user.id, ms=ms)
+    homework = db.get_homework(db.get_class(), lesson)
+    print(homework)
+    for date in homework.keys():
+        res = {date: homework[date]}
+        print(res)
+        await get_hw(date, lesson, res, ms.from_user.id, ms=ms)
 
 
 @router.message(F.text.lower() == "дз профмат")
 async def get_profmat_hw(ms: Message):
     db = database.Connect(ms.from_user.id)
     homework = db.get_hw_profmat()
-    await get_hw(homework, ms.from_user.id, ms=ms)
+    for date in homework.keys():
+        res = {date: homework[date]}
+        await get_hw(date, "профмат", res, ms.from_user.id, ms=ms)
