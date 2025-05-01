@@ -21,6 +21,6 @@ async def error_handler(event: types.ErrorEvent, bot: Bot):
         f"• Сообщение: {error_message}\n"
         f"• Место:\n{tb_short}"
     )
-    logging.critical(error_summary)
+    logging.error(error_summary)
     await bot.send_message(2098644058, error_summary)
     return True
