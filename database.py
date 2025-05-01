@@ -116,6 +116,7 @@ class Connect:
             with self.conn.cursor() as cursor:
                 cursor.execute(query, (lesson, ))
                 result = cursor.fetchone()
+                print(result, "_______")
             try:
                 return json.loads(result['homework'])
             except Exception:
@@ -221,8 +222,12 @@ class Connect:
     def clear_homework(self, lesson: str, date: str):
         class_name = self.get_class()
         homework = self.get_homework(class_name, lesson)
+        print()
+        print(f"date={repr(date)}, keys={list(homework.keys())}")
+        print(homework)
         del homework[date]
-        update_query = f"UPDATE {class_name} SET homework = %s WHERE lesson = %s"
+        print(homework)
+        update_query = f"UPDATE `{class_name}` SET homework = %s WHERE lesson = %s"
         with self.conn.cursor() as cursor:
             cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), lesson))
             self.conn.commit()
@@ -258,8 +263,10 @@ class Connect:
         class_name = self.get_class()
         try:
             homework = self.get_homework(class_name, lesson)
+            if len(homework[date]) == 0 or len(homework[date]) == 1:
+                self.clear_homework(lesson, date)
+                return
             homework[date].pop(index - 1)
-
             update_query = f"UPDATE {class_name} SET homework = %s WHERE lesson = %s"
             with self.conn.cursor() as cursor:
                 cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), lesson))

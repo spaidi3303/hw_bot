@@ -44,10 +44,8 @@ async def get_homework_keyboard(ms: Message):
         await ms.answer("По этому предмету нет дз")
         return
     homework = db.get_homework(db.get_class(), lesson)
-    print(homework)
     for date in homework.keys():
         res = {date: homework[date]}
-        print(res)
         await get_hw(date, lesson, res, ms.from_user.id, ms=ms)
 
 

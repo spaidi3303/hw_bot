@@ -69,7 +69,7 @@ class is_admin(Filter):
         return (uid == res['own']) or (uid in res['admins'])
 
 
-async def get_hw(date_hw, lesson, homework, uid: int, ms: Message | None = None, bot: Bot | None = None):
+async def get_hw(date_hw, lesson_hw, homework, uid: int, ms: Message | None = None, bot: Bot | None = None):
     res = []
     for lesson, hw in homework.items():
         res.append(f'{lesson} - {hw}')
@@ -81,8 +81,7 @@ async def get_hw(date_hw, lesson, homework, uid: int, ms: Message | None = None,
                 current_year = today.year
                 date_check = datetime.strptime(f"{current_year}-{idate.split(".")[1]}-{idate.split(".")[0]}", "%Y-%m-%d")
                 if date_check < today:
-                    continue
-
+                    return
             text = f"{i[:i.index("-")-1]}:"
             hw = i[i.index("-")+2:]
             hw = hw.replace('"', "*")
@@ -102,7 +101,6 @@ async def get_hw(date_hw, lesson, homework, uid: int, ms: Message | None = None,
                         album_builder.add_photo(media=fi_id)
                     await _send_media_group(album_builder.build(), uid, ms, bot)
             else:
-                print(1)
                 db = database.Connect(uid)
                 admins = db.get_admins()
                 isAdmin = uid in admins['admins'] or uid == admins['own']
@@ -111,7 +109,7 @@ async def get_hw(date_hw, lesson, homework, uid: int, ms: Message | None = None,
                     text += f"\n- {j}"
                 else:
                     if isAdmin:
-                        await _send_ms(text, uid, ms, bot, reply_markup=DelHw(date_hw, lesson))
+                        await _send_ms(text, uid, ms, bot, reply_markup=DelHw(date_hw, lesson_hw))
                     else:
                         await _send_ms(text, uid, ms, bot)
     else:
@@ -119,7 +117,6 @@ async def get_hw(date_hw, lesson, homework, uid: int, ms: Message | None = None,
 
 
 def DelHw(date_hw, lesson):
-    print(date_hw, lesson)
     builder = InlineKeyboardBuilder()
     builder.button(text="Удалить дз", callback_data=f"deldz:{date_hw}:{RUSSIAN_LESSONS[lesson]}")
     return builder.as_markup()
