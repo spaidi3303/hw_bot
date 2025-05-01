@@ -1,18 +1,16 @@
 import calendar
 from datetime import date, datetime, timedelta
 import json
-import logging
 from queue import Empty
 import re
 from aiogram import Bot
 from aiogram.types import Message
 from aiogram.filters import Filter
 from aiogram.utils.media_group import MediaGroupBuilder
-from others.constants import LESSONS, OWN_CLASS, OWN_ID, SHORTCUTS
+from others.constants import LESSONS, OWN_CLASS, SHORTCUTS
 import database
 
 days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
-
 
 WEEKDAYS_DICT = {
     'понедельник': calendar.MONDAY,
@@ -60,6 +58,7 @@ def is_lesson_in_date(lesson: str, date: str, class_name: str) -> bool:
     lessons = db.get_lessons()[weekday]
     return lesson in lessons
 
+
 class is_admin(Filter):  
     async def __call__(self, message: Message):
         uid = message.from_user.id
@@ -67,8 +66,8 @@ class is_admin(Filter):
         res = db.get_admins()
         return (uid == res['own']) or (uid in res['admins'])
 
-async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None = None):
 
+async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None = None):
     res = []
     for lesson, hw in homework.items():
         res.append(f'{lesson} - {hw}')
