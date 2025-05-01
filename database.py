@@ -12,22 +12,22 @@ days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'fr
 
 load_dotenv("secret.env")
 database = os.getenv("database")
-host = os.getenv("host")
-password = os.getenv("password")
-user = os.getenv("user")
+db_host = os.getenv("host")
+db_password = os.getenv("password")
+db_user = os.getenv("user")
 
 
 class Connect:
-    def __init__(self, id):
+    def __init__(self, uid):
         self.conn = pymysql.connect(
-            host=host,
+            host=db_host,
             port=3306,
-            user=user,
-            password=password,
+            user=db_user,
+            password=db_password,
             database=database,
             cursorclass=pymysql.cursors.DictCursor
         )
-        self.id = id
+        self.id = uid
         with self.conn.cursor() as cursor:
             cursor.execute(
                 "CREATE TABLE IF NOT EXISTS `Users` ("
