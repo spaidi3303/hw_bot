@@ -10,6 +10,7 @@ from aiogram.utils.media_group import MediaGroupBuilder
 from others.constants import LESSONS, OWN_CLASS, SHORTCUTS
 import database
 
+from aiogram.utils.keyboard import CallbackData, InlineKeyboardBuilder, InlineKeyboardButton
 days_of_week = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
 
 WEEKDAYS_DICT = {
@@ -59,7 +60,7 @@ def is_lesson_in_date(lesson: str, date: str, class_name: str) -> bool:
     return lesson in lessons
 
 
-class is_admin(Filter):  
+class is_admin(Filter):
     async def __call__(self, message: Message):
         uid = message.from_user.id
         db = database.Connect(uid)
@@ -80,7 +81,7 @@ async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None
                 date = datetime.strptime(f"{current_year}-{idate.split(".")[1]}-{idate.split(".")[0]}", "%Y-%m-%d")
                 if date < today:
                     continue
-            
+
             text = f"{i[:i.index("-")-1]}:"
             hw = i[i.index("-")+2:]
             hw = hw.replace('"', "*")
@@ -106,21 +107,40 @@ async def get_hw(homework, uid: int,  ms: Message | None = None, bot: Bot | None
                         await ms.answer_media_group(
                             media=album_builder.build()
                         )
+
                     else:
                         await bot.send_media_group(
                             chat_id=uid,
                             media=album_builder.build()
                         )
             else:
+                uid = ms.from_user.id
+                db = database.Connect(uid)
+                res = db.get_admins()
+                isAdmin =  (uid == res['own']) or (uid in res['admins'])
+                del db
                 for j in array_hw:
                     text += f"\n- {j}"
                 else:
                     if ms is not None:
-                        await ms.answer(text)
+                        if isAdmin:
+                            await ms.answer(text, reply_markup=DelHw())
+                        else:
+                            await ms.answer(text)
                     else:
-                        await bot.send_message(uid, text)
+                        if isAdmin:
+                            await bot.send_message(uid, text, reply_markup=DelHw())
+                        else:
+                            await bot.send_message(uid, text)
+
     else:
         if ms is not None:
             await ms.answer('Нет дз')
         else:
             await bot.send_message(uid, 'Нет дз')
+
+
+def DelHw():
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Удалить дз", callback_data="deldz")
+    return builder.as_markup()
