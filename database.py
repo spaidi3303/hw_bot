@@ -136,7 +136,7 @@ class Connect:
             homework[date] = array
             update_query = f"UPDATE {class_name} SET homework = %s WHERE lesson = %s"
             with self.conn.cursor() as cursor:       
-                cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), (lesson)))
+                cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), lesson))
                 self.conn.commit()
         except Exception as e:
             logging.error(f'Ошибка update_homework: {e}')
@@ -257,7 +257,7 @@ class Connect:
     def update_all_homework(self, class_, lesson, hw):
         update_query = f"UPDATE {class_} SET homework = %s WHERE lesson = %s"
         with self.conn.cursor() as cursor:       
-            cursor.execute(update_query, (json.dumps(hw, ensure_ascii=False), (lesson)))
+            cursor.execute(update_query, (json.dumps(hw, ensure_ascii=False), lesson))
             self.conn.commit()
 
     def add_admin(self, uid):
@@ -334,7 +334,7 @@ class Connect:
             homework[date] = array
             update_query = "UPDATE `profmat` SET `value` = %s WHERE `key` = %s"
             with self.conn.cursor() as cursor:       
-                cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), ("hw")))
+                cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), "hw"))
                 self.conn.commit()
         except Exception as e:
             logging.error(f'Ошибка add_hw_profmat: {e}')

@@ -17,7 +17,6 @@ router = Router()
     F.text.lower().regexp(fr'^дз ({'|'.join(WEEKDAYS)})$')
 )
 async def get_homework(ms: Message):
-    array = {1: 1, 2: 2, 3: 3}
     db = database.Connect(ms.from_user.id)
     class_name = db.get_class()
     text = ms.text.lower()
@@ -44,6 +43,7 @@ async def get_homework_keyboard(ms: Message):
     homework = db.get_homework(db.get_class(), get_lesson_full_name(lesson))
         
     await get_hw(homework, ms.from_user.id, ms=ms)
+
 
 @router.message(F.text.lower() == "дз профмат")
 async def get_profmat_hw(ms: Message):
