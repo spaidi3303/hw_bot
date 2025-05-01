@@ -41,6 +41,7 @@ class Connect:
 
     def __del__(self):
         self.conn.close()
+
     def check_table(self, db_name):
         try:
             if re.fullmatch(r"\d\d_[a-z]", db_name):
@@ -91,7 +92,7 @@ class Connect:
                     cursor.execute(insert_query, ("uids", json.dumps(profmat_id)))
                     cursor.execute(insert_query, ("hw", json.dumps({})))
                     self.conn.commit()
-        except Exception as e:
+        except Exception:
             ...
 
     def user_exists(self) -> bool:
@@ -120,7 +121,7 @@ class Connect:
             except Exception:
                 return {}
         except Exception as e:
-                logging.error(f'Ошибка get_hw: {e}')
+            logging.error(f'Ошибка get_hw: {e}')
 
     def update_homework(self, class_name: str, lesson: str, date: str, homework_text) -> None:
         try:
@@ -138,7 +139,7 @@ class Connect:
                 cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), (lesson)))
                 self.conn.commit()
         except Exception as e:
-                logging.error(f'Ошибка update_homework: {e}')
+            logging.error(f'Ошибка update_homework: {e}')
 
     def del_table(self, table_name):
         with self.conn.cursor() as cursor:
@@ -167,7 +168,7 @@ class Connect:
 
             return result
         except Exception as e:
-            print(f'Ошибка get_lessons: {e}')
+            logging.error(f'Ошибка get_lessons: {e}')
 
     def get_admins(self):
         try:
@@ -178,7 +179,6 @@ class Connect:
                 return json.loads(result['value'])
         except Exception as e:
             logging.error(f'Ошибка get_admins: {e}')
-            return None
 
     def get_all_homework(self, class_name, date: str) -> dict:
         try:
@@ -198,7 +198,7 @@ class Connect:
                     homework = "Нет дз"
             return array
         except Exception as e:
-                logging.error(f'Ошибка get_all_hw: {e}')
+            logging.error(f'Ошибка get_all_hw: {e}')
 
     def get_all_dates(self, lesson: str):
         try:
@@ -216,7 +216,7 @@ class Connect:
             sorted_dates = sorted(array, key=lambda x: datetime.datetime.strptime(f"{x}.2000", '%d.%m.%Y'))
             return sorted_dates
         except Exception as e:
-                logging.error(f'Ошибка get_all_dates: {e}')
+            logging.error(f'Ошибка get_all_dates: {e}')
 
     def del_homework(self, lesson: str, date: str):
         class_name = self.get_class()
@@ -274,7 +274,6 @@ class Connect:
                 update_query = f"UPDATE `{class_}_class` SET `value` = %s WHERE `key` = %s"
                 cursor.execute(update_query, (json.dumps(js), "admins"))
                 self.conn.commit()
-                
         except Exception as e:
             logging.error(f'Ошибка add_admin: {e}')
             return False
@@ -283,7 +282,7 @@ class Connect:
     def del_admin(self, uid):
         try:
             class_ = self.get_class()
-                
+
             with self.conn.cursor() as cursor:
                 cursor.execute(f"SELECT `value` FROM `{class_}_class` WHERE `key` = 'admins'")
                 array = json.loads(cursor.fetchone()['value'])['admins']
@@ -294,11 +293,9 @@ class Connect:
                 update_query = f"UPDATE `{class_}_class` SET `value` = %s WHERE `key` = %s"
                 cursor.execute(update_query, (json.dumps(js), "admins"))
                 self.conn.commit()
-                
         except Exception as e:
             logging.error(f'Ошибка add_admin: {e}')
             return False
-    
 
     def get_profmat_ids(self) -> list:
         try:
@@ -308,7 +305,7 @@ class Connect:
                 result = cursor.fetchall()
             return json.loads(result[0]["value"])
         except Exception as e:
-            print(f'Ошибка get_profmat_ids: {e}')   
+            logging.error(f'Ошибка get_profmat_ids: {e}')
 
     def get_hw_profmat(self) -> dict:
         try:
@@ -317,11 +314,10 @@ class Connect:
                 cursor.execute("SELECT `value` FROM `profmat`")
                 result = cursor.fetchall()
                 array_hw = json.loads(result[1]['value'])
-                
+
             return array_hw
-        
         except Exception as e:
-            print(f'Ошибка get_hw_profmat: {e}')
+            logging.error(f'Ошибка get_hw_profmat: {e}')
 
     def add_hw_profmat(self, hw: str, date: str):
         try:
@@ -336,14 +332,12 @@ class Connect:
 
             array.append(hw)
             homework[date] = array
-            update_query = f"UPDATE `profmat` SET `value` = %s WHERE `key` = %s"
+            update_query = "UPDATE `profmat` SET `value` = %s WHERE `key` = %s"
             with self.conn.cursor() as cursor:       
                 cursor.execute(update_query, (json.dumps(homework, ensure_ascii=False), ("hw")))
                 self.conn.commit()
-
         except Exception as e:
-            print(f'Ошибка add_hw_profmat: {e}')
-
+            logging.error(f'Ошибка add_hw_profmat: {e}')
 
     def get_all_from_table(self, table_name):
         try:
@@ -352,4 +346,4 @@ class Connect:
                 result = cursor.fetchall()
                 return result
         except Exception as e:
-            print(f'Ошибка get_all_from_table: {e}')
+            logging.error(f'Ошибка get_all_from_table: {e}')
