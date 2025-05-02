@@ -32,6 +32,8 @@ async def get_homework(ms: Message):
     for lesson in homeworks.keys():
         res = {lesson: homeworks[lesson]}
         await get_hw(date, lesson, res, ms.from_user.id, ms=ms)
+    if not homeworks.keys():
+        await ms.answer("Нет дз")
 
 
 @router.message(F.text.lower().regexp(f'^дз ({'|'.join(LESSONS.keys())}|{'|'.join(SHORTCUTS.keys())})$'))

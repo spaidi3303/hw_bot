@@ -1,4 +1,5 @@
 import calendar
+import logging
 from datetime import date, datetime, timedelta
 import json
 import re
@@ -73,48 +74,44 @@ async def get_hw(date_hw, lesson_hw, homework, uid: int, ms: Message | None = No
     res = []
     for lesson, hw in homework.items():
         res.append(f'{lesson} - {hw}')
-    if res:
-        for i in res:
-            if re.findall(r"\d\d\.\d\d", i):
-                idate = i.split("-")[0].strip()
-                today = datetime.now()
-                current_year = today.year
-                date_check = datetime.strptime(f"{current_year}-{idate.split(".")[1]}-{idate.split(".")[0]}", "%Y-%m-%d")
-                if date_check < today:
-                    return
-            text = f"{i[:i.index("-")-1]}:"
-            hw = i[i.index("-")+2:]
-            hw = hw.replace('"', "*")
-            array_hw = json.loads(hw.replace("'", '"'))
+    for i in res:
+        if re.findall(r"\d\d\.\d\d", i):
+            idate = i.split("-")[0].strip()
+            today = datetime.now()
+            current_year = today.year
+            date_check = datetime.strptime(f"{current_year}-{idate.split(".")[1]}-{idate.split(".")[0]}", "%Y-%m-%d")
+            if date_check < today:
+                return
+        text = f"{i[:i.index("-")-1]}:"
+        hw = i[i.index("-")+2:]
+        hw = hw.replace('"', "*")
+        array_hw = json.loads(hw.replace("'", '"'))
 
-            if any(isinstance(item, list) for item in array_hw):
-                photo_ids = []
-                for j in array_hw:
-                    if isinstance(j, str):
-                        text += f"\n- {j}"
-                    elif isinstance(j, list):
-                        for file_id in j:
-                            photo_ids.append(file_id)
-                if photo_ids:
-                    album_builder = MediaGroupBuilder(caption=text)
-                    for fi_id in photo_ids:
-                        album_builder.add_photo(media=fi_id)
-                    await _send_media_group(album_builder.build(), uid, ms, bot)
-            else:
-                db = database.Connect(uid)
-                admins = db.get_admins()
-                isAdmin = uid in admins['admins'] or uid == admins['own']
-                del db
-                for j in array_hw:
+        if any(isinstance(item, list) for item in array_hw):
+            photo_ids = []
+            for j in array_hw:
+                if isinstance(j, str):
                     text += f"\n- {j}"
+                elif isinstance(j, list):
+                    for file_id in j:
+                        photo_ids.append(file_id)
+            if photo_ids:
+                album_builder = MediaGroupBuilder(caption=text)
+                for fi_id in photo_ids:
+                    album_builder.add_photo(media=fi_id)
+                await _send_media_group(album_builder.build(), uid, ms, bot)
+        else:
+            db = database.Connect(uid)
+            admins = db.get_admins()
+            isAdmin = uid in admins['admins'] or uid == admins['own']
+            del db
+            for j in array_hw:
+                text += f"\n- {j}"
+            else:
+                if isAdmin:
+                    await _send_ms(text, uid, ms, bot, reply_markup=DelHw(date_hw, lesson_hw))
                 else:
-                    if isAdmin:
-                        await _send_ms(text, uid, ms, bot, reply_markup=DelHw(date_hw, lesson_hw))
-                    else:
-                        await _send_ms(text, uid, ms, bot)
-    else:
-        await _send_ms('Нет дз', uid, ms, bot)
-
+                    await _send_ms(text, uid, ms, bot)
 
 def DelHw(date_hw, lesson):
     builder = InlineKeyboardBuilder()

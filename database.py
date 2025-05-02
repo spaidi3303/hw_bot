@@ -116,7 +116,6 @@ class Connect:
             with self.conn.cursor() as cursor:
                 cursor.execute(query, (lesson, ))
                 result = cursor.fetchone()
-                print(result, "_______")
             try:
                 return json.loads(result['homework'])
             except Exception:
