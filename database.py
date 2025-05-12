@@ -338,7 +338,7 @@ class Connect:
         except Exception as e:
             logging.error(f'Ошибка get_hw_profmat: {e}')
 
-    def add_hw_profmat(self, hw: str, date: str):
+    def add_hw_profmat(self, hw: str | list, date: str):
         try:
             self.check_table("profmat")
             homework = self.get_hw_profmat()

@@ -72,7 +72,6 @@ async def add_homework_photos(caption: str, photos: list, message: Message):
         db.add_hw_profmat(photos, date)
         await message.answer(f"Домашнее задание по профмат было добавлено на {date}")
         return
-
     else:
         return
     if not is_lesson_in_date(lesson, date, class_name):

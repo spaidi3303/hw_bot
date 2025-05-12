@@ -113,6 +113,6 @@ async def password_input(ms: Message, state: FSMContext):
         db = database.Connect(ms.from_user.id)
         db.update_login_password(res['login'], res['password'])
     else:
-        await ms.answer("Ваши данные не коректны! Перепроверьте логин и пароль")
+        await ms.answer("Ваши данные не корректны! Перепроверьте логин и пароль")
         await state.set_state(RegisterDnevnikState.login)
         await ms.answer("Введи свой логин от дневника")

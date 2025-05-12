@@ -1,5 +1,4 @@
 import calendar
-import logging
 from datetime import date, datetime, timedelta
 import json
 import re
@@ -34,7 +33,7 @@ def get_closest_lesson(lesson: str, class_name: str) -> str:
         day_week = days_of_week[date.isoweekday()]
         if lesson in array[day_week]:
             return date.strftime('%d.%m')
-        day_interval = day_interval + 1
+        day_interval += 1
 
 
 def get_prope_date(weekday: str) -> str:

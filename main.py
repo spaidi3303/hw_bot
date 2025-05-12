@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 from get.notifications import send_homework
 import error
-from others.constants import OWN_ID
+# from others.constants import OWN_ID
 import others.routers as routers
 
 load_dotenv("secret.env") 

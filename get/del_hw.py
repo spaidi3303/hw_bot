@@ -1,12 +1,12 @@
-
 from aiogram import Router, F
-from aiogram.types import CallbackQuery, Message
-from aiogram.utils.keyboard import CallbackData, InlineKeyboardBuilder, InlineKeyboardButton
+from aiogram.types import CallbackQuery
+from aiogram.utils.keyboard import CallbackData, InlineKeyboardBuilder
 
 import database
 from others.constants import ENGLISH_LESSONS, RUSSIAN_LESSONS
 
 router = Router()
+
 
 @router.callback_query(F.data.startswith("deldz"))
 async def call(query: CallbackQuery):
@@ -15,19 +15,18 @@ async def call(query: CallbackQuery):
     text = query.message.text
     spl = text.split("\n")
     text = text.replace(spl[0], f"Какое дз вы хотите удалить по {lesson}?")
-    count = 1
-    for i in range(1, len(spl)):
-        if spl[i].startswith("-"):
-            text = text.replace(spl[i], f"{count}) {spl[i]}")
-            count = count + 1
+    for i, sp in enumerate(spl, 1):
+        if sp.startswith('-'):
+            text = sp, f'{i}) {sp}'
     await query.message.edit_text(text,
-                                  reply_markup=del_hw_builder(count, date, RUSSIAN_LESSONS[lesson]))
+                                  reply_markup=del_hw_builder(len(spl), date, RUSSIAN_LESSONS[lesson]))
 
 
 class DelHwClass(CallbackData, prefix="hwdel"):
     lesson: str
     date: str
     index: str
+
 
 def del_hw_builder(count, date, lesson):
     builder = InlineKeyboardBuilder()
@@ -43,4 +42,4 @@ async def call(query: CallbackQuery, callback_data: DelHwClass):
     index = callback_data.index
     db = database.Connect(query.from_user.id)
     db.del_hw(date, lesson, int(index))
-    await query.message.edit_text("Домашная работа была удалена")
+    await query.message.edit_text("Домашняя работа была удалена")

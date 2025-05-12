@@ -17,9 +17,6 @@ async def ban_user(ms: types.Message):
 
 @router.message(F.text.lower() == "пользователи", F.from_user.id.in_(OWN_ID))
 async def list_users(ms: types.Message):
-    db = database.Connect(1)
-    all_id = db.get_all_id()
-    del db
     text = ""
     ten_a = ""
     ten_b = ""
